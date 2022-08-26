@@ -1,0 +1,4 @@
+Add more node in segtree
+Implement a system that automatically runs datagen and solution, and report wrong answer.
+Write some random utilities in datagen to accelerate it.
+Finish binary lifting template
