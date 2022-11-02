@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+# Custom Files
+input.txt
+main.cpp
+cmake-build-debug/

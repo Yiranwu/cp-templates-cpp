@@ -6,7 +6,7 @@ set(CMAKE_CXX_FLAGS "-Wall -DLOCAL -fsanitize=address")
 
 
 add_executable(cf_main main.cpp)
-set_target_properties(cf_main PROPERTIES LINK_FLAGS -Wl,-stack_size,25600000)
+set_target_properties(cf_main PROPERTIES LINK_FLAGS -Wl,-stack_size,5120000)
 
 add_executable(cf_checker sol_checker.cpp cf-lib/SegmentTree.h cf-lib/BlockedList.h)
 
