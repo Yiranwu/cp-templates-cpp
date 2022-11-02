@@ -32,6 +32,7 @@
 *.app
 
 # Custom Files
+.idea/
 input.txt
 main.cpp
 cmake-build-debug/
