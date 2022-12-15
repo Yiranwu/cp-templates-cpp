@@ -17,12 +17,13 @@ int n, data_min[MAXN*2], add_tag[MAXN*2], c[MAXN];
 int next_block_size, next_size[NB+2], next_loc[NB+2][SQRTN][SQRTN], block_add[NB+2][SQRTN], suffix[NB+2][B+2];
 int Bid[MAXN], Bp[MAXN], BL[NB+2], BR[NB+2], nextid[MAXN], nextp[MAXN], nextL[SQRTN], nextR[SQRTN];
 
-template <typename T> void readint(T &x)
+template <typename T>
+void readint(T &first, int i)
 {
-    x=0;int f=1;char c;
+    first=0;int f=1;char c;
     for(c=getchar();!isdigit(c);c=getchar())if(c=='-')f=-1;
-    for(;isdigit(c);c=getchar())x=x*10+(c-'0');
-    x*=f;
+    for(;isdigit(c);c=getchar())first= first * 10 + (c - '0');
+    first*=f;
 }
 
 void nextAddRange(int bid, int l, int r, int v) {
@@ -237,11 +238,11 @@ int main() {
     cin.tie(0);
     //freopen("/Users/yiran/CLionProjects/codeforces/input.txt", "r", stdin);
     //freopen("~/ClionProjects/codeforces/output.txt", "w", stdout);
-    readint(n);
+    readint(n, 0);
     next_block_size = ceil(sqrt(n));
 
     for(int i=0;i<n;++i) {
-        readint(c[i]);
+        readint(c[i], 0);
         c[i]=i-c[i];
     }
 
@@ -274,11 +275,11 @@ int main() {
     //printf("build time %f\n", (double)(sol_begin-build_begin)/CLOCKS_PER_SEC);
 
     int q, qid, qi, qx;
-    readint(q);
+    readint(q, 0);
     for(int i=0;i<q;++i) {
-        readint(qid);
+        readint(qid, 0);
         if(qid==1) {
-            readint(qi), readint(qx);
+            readint(qi, 0), readint(qx, 0);
             c[qi-1]=(qi-1)-qx;
 
             //clock_t upd_begin = clock();
@@ -291,7 +292,7 @@ int main() {
             //++upd_cnt;
         }
         else {
-            readint(qi);
+            readint(qi, 0);
 
             //clock_t qry_begin = clock();
 

@@ -8,7 +8,7 @@
 // Suppose x=pq, will mark x when finding multiples of q, and considering prime factor p.
 class SieveOfEuler {
 public:
-    const static int NP=80000, MAXN=1000000;
+    // const static int NP=80000, MAXN=1000000;
     int n;
     vector<int> p, fac;
     vector<bool> flag;

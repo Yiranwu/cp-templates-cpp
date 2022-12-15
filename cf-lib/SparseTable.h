@@ -17,6 +17,29 @@ public:
     GCDStats operator + (GCDStats& other) {return GCDStats<dataT>(gcd(v, other.v)); }
 };
 
+template <typename dataT>
+class ArgmaxStats {
+public:
+    dataT v;
+
+    explicit ArgmaxStats(dataT _v): v(_v) {}
+
+    dataT at(int i) {
+        // get element @ i
+    }
+
+    ArgmaxStats operator + (ArgmaxStats& other) {
+        dataT argm;
+        if (at(v) > at(other.v))
+            argm = v;
+        else if(at(v) == at(other.v))
+            argm = min(v, other.v);
+        else argm = other.v;
+
+        return ArgmaxStats<dataT>(argm);
+    }
+};
+
 template <typename dataT, typename statsT>
 class SparseTable {
 public:

@@ -53,6 +53,8 @@ typedef vector<int> vi;
 typedef vector<ll> vl;
 typedef vector<vector<int>> vvi;
 typedef vector<vector<ll>> vvl;
+typedef vector<pii> vpii;
+typedef vector<pll> vpll;
 typedef vector<vector<pair<int,int>>> vvpii;
 typedef vector<vector<pair<int,int>>> vvpll;
 typedef map<int,int> mii;
@@ -67,6 +69,7 @@ template <typename T> bool is_prime(T x) {
     for(T i=2;i<=T(sqrt(x)+1e-7);++i) if(x%i==0) return false;
     return true;
 }
+template <typename T> T mod(T a, T x) {return (((a)%x+x)%x);}
 template <typename T> bool is_composite(T x) {
     assert(x>=0); if(x<=1) return false;
     return !is_prime(x);
@@ -75,6 +78,7 @@ ll pow2(ll x){return 1LL<<x;}
 ll digitAt(ll x, int pow) {return x&pow2(pow);}
 template <typename T> bool inRange(pair<T,T> range, T x) {return range.x<=x && x<=range.y;}
 //std::popcount(unsigned_type x)
+ll lowbit(ll i) {return i & -i;}
 class pairHashClass {
 public:
     template <class T1, class T2>
@@ -82,17 +86,27 @@ public:
         return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
     }
 };
-template <typename T> std::vector<int> argsort(T it_begin, T it_end, int start_id=0, int pad=1) {
+template <typename T> std::vector<int> argsort(T it_begin, T it_end, int start_id=0) {
+    // start_id: the index of first element. Usually is 0 or 1.
     assert(start_id>=0);
-    std::vector<int> indices(it_end - it_begin + pad);
-    std::iota(begin(indices)+pad, end(indices), start_id);
+    std::vector<int> indices(it_end - it_begin);
+    std::iota(all(indices), start_id);
     std::sort(
-            begin(indices)+pad, end(indices),
-            [&](size_t a, size_t b) { return *(it_begin+a-start_id) < *(it_begin+b-start_id); }
+            all(indices),
+            [&](int a, int b) { return *(it_begin+a-start_id) < *(it_begin+b-start_id); }
     );
     return indices;
 }
-template <typename T> void readint(T &x) {
+template <typename T> std::vector<int> iterableToRank(T it_begin, T it_end, int start_id=0) {
+    auto argV = argsort(it_begin, it_end);
+    vi rank(it_end-it_begin);
+    for(size_t i=0;i<it_end-it_begin;++i) {
+        rank[argV[i]]=i+start_id;
+    }
+    return rank;
+}
+template <typename T>
+void readint(T &first, int i) {
     x=0;int f=1;char c;
     for(c=getchar();!isdigit(c);c=getchar())if(c=='-')f=-1;
     for(;isdigit(c);c=getchar())x=x*10+(c-'0');

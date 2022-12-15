@@ -60,7 +60,8 @@ template <typename T> bool is_composite(T x) {
 ll pow2(ll x){return 1LL<<x;}
 template <typename T> int bitOneCount(T x) {int ans=0; while(x) ++ans, x&=x-1; return ans;}
 template <typename T> bool pairRCmp(pair<T,T> x, pair<T,T> y) {return x.y<y.y || x.y==y.y && x.x<y.x;}
-template <typename T> void readint(T &x) {
+template <typename T>
+void readint(T &first, int i) {
     x=0;int f=1;char c;
     for(c=getchar();!isdigit(c);c=getchar())if(c=='-')f=-1;
     for(;isdigit(c);c=getchar())x=x*10+(c-'0');
@@ -68,7 +69,7 @@ template <typename T> void readint(T &x) {
 }
 template <typename T, typename... Ts> void readint(T &x, Ts&... xs) {readint(x); readint(xs...);}
 template <typename T> void readint_n(T *a, int n)  {for(int i=0;i<n;++i) readint(a[i]);}
-template <typename T> void readint_with_n(T *a, int &n) {readint(n); readint_n(a, n);}
+template <typename T> void readint_with_n(T *a, int &n) { readint(n, 0); readint_n(a, n);}
 template <typename T> void printint_n(T *a, int n, char *format)  {for(int i=0;i<n;++i) printf(format, a[i]); printf("\n");}
 template <typename T> T merge_container(T c1, T c2) {
     T ret;
@@ -135,7 +136,8 @@ ll t,n;
 ll get_query(ll x,ll y) {
     if(y<=x) return 0;
     printf("? %lld %lld\n", x, y); fflush(stdout);
-    ll ret; readint(ret);
+    ll ret;
+    readint(ret, 0);
     if(ret==-1LL) exit(0);
     return ret;
 }
@@ -171,9 +173,9 @@ int main()
 //#ifdef LOCAL
 //    freopen("/Users/yiran/CLionProjects/codeforces/input.txt", "r", stdin);
 //#endif
-    readint(t);
+    readint(t, 0);
     while(t--) {
-        readint(n);
+        readint(n, 0);
         ll sum = get_query(1,n);
         ll l=0,r=n, mid, i,j,k;
         ll sum_mid;

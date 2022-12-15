@@ -10,7 +10,7 @@ T gcd(T a,T b) {
 }
 
 template <typename T>
-T gcdExtended(T a, T b, T &x, T &y)
+T exgcd(T a, T b, T &x, T &y)
 {
     if (a == 0)
     {
@@ -29,7 +29,7 @@ T gcdExtended(T a, T b, T &x, T &y)
 template <typename T>
 T ModInvCoPrime(T a,T p) {
     T x,y,g;
-    gcdExtended(a, p,x,y);
+    exgcd(a, p,x,y);
     if(x<0)
         return x+((-x-1)/p+1)*p;
     else
