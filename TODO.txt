@@ -1,4 +1,10 @@
 Add more node in segtree
+Create a workflow of testing: datagen write to fstream -> file reads from that stream
 Implement a system that automatically runs datagen and solution, and report wrong answer.
 Write some random utilities in datagen to accelerate it.
 Finish binary lifting template
+Modify trie
+argrank?
+make graph easier to use
+argsort rename
+argsort apply argsort

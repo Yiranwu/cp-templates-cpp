@@ -1,14 +1,26 @@
 #pragma GCC optimize ("-Ofast")
+
+// There is a bug in codeforces machine that prevents compilation to some targets,
+// if we put this include after target definition.
+// It's fixed in gcc but not yet ported to codeforces.
+// This include works with the following targets only: sse,sse2,mmx,avx,tune=native
+// Source: https://codeforces.com/blog/entry/126772
+#include<iterator>
+
+#ifndef LOCAL
 #pragma GCC target("sse,sse2,sse3,ssse3,sse4,popcnt,abm,mmx,avx,avx2,tune=native")
+#endif
+
 #pragma GCC optimize ("unroll-loops")
 #include<cstdio>
 #include<iostream>
 #include<cstring>
-#include <utility>
+#include<utility>
 #include<vector>
 #include<list>
 #include<algorithm>
 #include<vector>
+#include<tuple>
 #include<map>
 #include<unordered_map>
 #include<set>
@@ -19,15 +31,19 @@
 #include<cassert>
 #include<cmath>
 #include<memory>
-#include<iterator>
 #include<random>
 #include<chrono>
 #include<climits>
+#include<type_traits>
+#include<stdexcept>
+
+// clang does not support some of c++20 features officially
+// need compiler option -fexperimental-library
+#include<format>
+#include<ranges>
 #include<bit>
+
 using namespace std;
-const int H=23333;
-const int M=998244353;
-//const int M=1000000007;
 #define mp make_pair
 #define pb push_back
 #define x first
@@ -37,14 +53,23 @@ const int M=998244353;
 #define repin(i,l,r) for(int i=l;i<=r;++i)
 #define rrep(i,r,l) for(int i=r;i>l;--i)
 #define rrepin(i,r,l) for(int i=r;i>=l;--i)
-#define memset0(a) memset(a,0,sizeof(a))
 #define modM(a) (((a)%M+M)%M)
+#define addM(a,b) ((modM(a) + modM(b))%M)
+#define subM(a,b) (modM(modM(a) - modM(b)))
+#define multM(a,b) (modM(modM(a) * modM(b)))
+#define divM(a,b) (multM(a, Qinv(b,M)))
+#define QinvM(a) (Qinv(a,M))
 #define my_fill_n(arr, cnt, v) fill_n(arr, (cnt)+1, v)
 #define all(data) (data).begin(), (data).end()
 #define println() printf("\n")
 #define selectOther(x,y,z) ((z)==(x)?(y):(x))
 #define endlCh '\n'
 #define log2int(x) (int(log2(x)))
+#define usafe_at(arr, i, val) ((i)>=(arr).size()? (val) : ((arr)[i]))
+#define usafe_index(arr, i, ub, val) ((i)>=(ub)? (val) : ((arr)[i]))
+#define lsafe_at(arr, i, val) ((i)<0? (val) : ((arr)[i]))
+#define lsafe_index(arr, i, lb, val) ((i)<(lb)? (val) : ((arr)[i]))
+#define DEBUGLOG(mark) (cout << std::format("Passing function {} at mark {}", __FUNCTION__, mark))
 typedef long long ll;
 typedef unsigned long long ull;
 typedef pair<int,int> pii;
@@ -64,108 +89,50 @@ template <typename T> void chkmin(T &x,T y){y<x?x=y:T();}
 template <typename T> T parity(T x) {return x&1LL;}
 template <typename T> bool is_odd(T x) {return parity(x)==1;}
 template <typename T> bool is_even(T x) {return parity(x)==0;}
-template <typename T> bool is_prime(T x) {
-    assert(x>=0); if(x<=1) return false;
-    for(T i=2;i<=T(sqrt(x)+1e-7);++i) if(x%i==0) return false;
-    return true;
-}
 template <typename T> T mod(T a, T x) {return (((a)%x+x)%x);}
-template <typename T> bool is_composite(T x) {
-    assert(x>=0); if(x<=1) return false;
-    return !is_prime(x);
-}
 ll pow2(ll x){return 1LL<<x;}
 ll digitAt(ll x, int pow) {return x&pow2(pow);}
-template <typename T> bool inRange(pair<T,T> range, T x) {return range.x<=x && x<=range.y;}
-//std::popcount(unsigned_type x)
+bool digitIsOn(ll x, int pow) {return (x&pow2(pow))>0;}
+ll fullBitmask(ll n) {return pow2(n)-1;}
+ll rangeBitmask(ll pow_lb, ll pow_ub) {return fullBitmask(pow_ub) - fullBitmask(pow_lb);}
+ll extractBitRange(ll x, ll pow_lb, ll pow_ub) {return x & rangeBitmask(pow_lb, pow_ub);}
+template <typename T> bool inRange(T x, pair<T,T> range) {return range.x<=x && x<=range.y;}
 ll lowbit(ll i) {return i & -i;}
-class pairHashClass {
-public:
-    template <class T1, class T2>
-    std::size_t operator() (const std::pair<T1, T2> &pair) const {
-        return std::hash<T1>()(pair.first) ^ std::hash<T2>()(pair.second);
-    }
-};
-template <typename T> std::vector<int> argsort(T it_begin, T it_end, int start_id=0) {
-    // start_id: the index of first element. Usually is 0 or 1.
-    assert(start_id>=0);
-    std::vector<int> indices(it_end - it_begin);
-    std::iota(all(indices), start_id);
-    std::sort(
-            all(indices),
-            [&](int a, int b) { return *(it_begin+a-start_id) < *(it_begin+b-start_id); }
-    );
-    return indices;
-}
-template <typename T> std::vector<int> iterableToRank(T it_begin, T it_end, int start_id=0) {
-    auto argV = argsort(it_begin, it_end);
-    vi rank(it_end-it_begin);
-    for(size_t i=0;i<it_end-it_begin;++i) {
-        rank[argV[i]]=i+start_id;
-    }
-    return rank;
-}
+ll highbit(ll x) {while(x!=lowbit(x)) {x-=lowbit(x);} return x;}
+ll lowpow(ll x) {return log2int(lowbit(x));}
+ll highpow(ll x) {return log2int(highbit(x));}
 template <typename T>
-void readint(T &first, int i) {
-    x=0;int f=1;char c;
-    for(c=getchar();!isdigit(c);c=getchar())if(c=='-')f=-1;
-    for(;isdigit(c);c=getchar())x=x*10+(c-'0');
-    x*=f;
-}
-//template <typename T, typename... Ts> void readint(T &x, Ts&... xs) {readint(x); readint(xs...);}
-//template <typename T> void readint_n(T *a, int n)  {for(int i=0;i<n;++i) readint(a[i]);}
-//template<typename T> void readint_n(vector<T> &V, int n) {for(int i=0;i<n;++i) {T tmp; readint(tmp); V.pb(tmp);}}
-//template <typename T> void readint_n_with_n(T *a, int &n) {readint(n); readint_n(a, n);}
-//template <typename T> void readint_n_with_n(vector<T> &a, int &n) {readint(n); readint_n(a, n);}
+int popCount(T x) {std::make_unsigned_t<T> ux(x); return __builtin_popcount(ux);}
+// template <typename T>
+// void readint(T &first, int i) {
+//     x=0;int f=1;char c;
+//     for(c=getchar();!isdigit(c);c=getchar())if(c=='-')f=-1;
+//     for(;isdigit(c);c=getchar())x=x*10+(c-'0');
+//     x*=f;
+// }
+template <typename T> void read(T &x) {cin >> x;}
+template <typename T, typename... Ts> void read(T &x, Ts&... xs) {read(x); read(xs...);}
 template <typename T> void readint_n(T *a, int n) {for(int i=0;i<n;++i) cin>>a[i];}
 template <typename T> void readint_n(vector<T> &a, int n) {T tmp; a.pb(T()); for(int i=0;i<n;++i) cin>>tmp, a.pb(tmp);}
 template <typename T> void readint_n_with_n(T *a, int &n) {cin>>n; readint_n(a, n);}
 template <typename T> void readint_n_with_n(vector<T> &a, int &n) {cin>>n; readint_n(a, n);}
-//template <typename T> void printint_n(T pbegin, T pend, char *format)  {for(auto p=pbegin;p!=pend;++p) printf(format, *p); printf("\n");}
-//template <typename T> void printint_n(T pbegin, T pend)  {for(auto p=pbegin;p!=pend;++p) cout<<p<<' '; cout<<endl;}
 template <typename T> void printint_n(T pbegin, T pend, char *format)  {for(auto p=pbegin;p!=pend;++p) printf(format, *p); printf("\n");}
 template <typename T> void printint_n(T pbegin, T pend)  {for(auto p=pbegin;p!=pend;++p) cout<<*p<<' '; cout<<'\n';}
-template <typename dataT>
-class vectorWithOffset {
-public:
-    using vecT = vector<dataT>;
-    vector<dataT> vec;
-    int offset;
-    explicit vectorWithOffset(const vector<dataT>& _vec, int _offset=1): vec(_vec), offset(_offset) {}
-    explicit vectorWithOffset(vector<dataT>&& _vec, int _offset=1): vec(_vec), offset(_offset) {}
-    size_t size() {return vec.size();}
-    decltype(vec.begin()) begin() {return vec.begin();}
-    decltype(vec.end()) end() {return vec.end();}
-    decltype(vec.rbegin()) rbegin() {return vec.rbegin();}
-    decltype(vec.rend()) rend() {return vec.rend();}
-
-    void push_back(dataT data) {vec.push_back(data);}
-    dataT& operator[] (int index) {return vec[index-offset];}
-    void clear() {vec.clear();}
-};
-template <typename T> T merge_container(T c1, T c2) {
+// Only trust this with array-like STL containers.
+// For map, set, etc, this might not work due to the use of std::back_inserter
+template <typename T> void mergeContainerInPlace(T& c1, const T& c2) {
+    T *t1=c1, *t2=c2;
+    if(t1->size() < t2->size()) std::swap(t1,t2);
+    std::copy(t2->begin(), t2->end(), std::back_inserter(*t1));
+}
+template <typename T> T mergeContainer(const T& c1, const T& c2) {
     T ret;
     ret.reserve(c1.size()+c2.size());
-    ret.insert(ret.end(), c1.start(), c1.end());
-    ret.insert(ret.end(), c2.start(), c2.end());
+    std::copy(all(c1), std::back_inserter(ret));
+    std::copy(all(c2), std::back_inserter(ret));
+    return ret;
 }
-template <typename T, typename funcT> T binSearchL(T pl, T pr, funcT check) {
-    //assert(check(pl)); assert(!check(pr));
-    while(pl<pr-1) {
-        T pmid=(pl+pr)/2;
-        if(check(pmid)) pl=pmid; else pr=pmid;
-    }
-    return pl;
-}
-template <typename T, typename funcT> T binSearchR(T pl, T pr, funcT check) {
-    auto neg_check = [check](T input) {return !check(input);};
-    return binSearchL(pl,pr,neg_check);
-}
-template <typename kT, typename vT> void incMapCount(map<kT, vT> &M, kT key) {
-    if(!M.contains(key)) M[key]=0;
-    ++M[key];
-}
-template <typename T> unordered_set<T> toUSet (T *a, int n) {unordered_set<T> ret; rep0(i,n) ret.insert(a[i]); return ret;}
+inline ll Qpow(ll a,ll b){ll s=1;while(b){if(b&1){s=s*a;}a=a*a;b>>=1;}return s;}
 inline ll Qpow(ll a,ll b,ll M){ll s=1;while(b){if(b&1){s=(s*a)%M;}a=a*a%M;b>>=1;}return s;}
 inline ll Qinv(ll a, ll M){return Qpow(a,M-2,M);}
 template <typename T> T divceil(T x, T y) {return (x-1)/y + 1;}
@@ -176,9 +143,50 @@ T gcd(T a,T b) {
 }
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count()+1);
 
-const int MAXN=200005;
-int t,n;
-int a[MAXN];
+/*
+class solver {
+public:
+    int t;
+    int n;
+    int a[MAXN];
+
+    explicit solver() {
+    }
+
+    void solve() {
+        cin >> t;
+        while(t--) {
+            cin >> n;
+            readint_n(a+1, n);
+        }
+    }
+};
+ */
+
+const int H=23333;
+//const ll M=998244353;
+const ll M = 1000000007;
+
+
+const int MAXN = 400005;
+
+class solver {
+public:
+    int t;
+    int n;
+    int a[MAXN];
+
+    explicit solver() {
+    }
+
+    void solve() {
+        cin >> t;
+        while(t--) {
+            cin >> n;
+            readint_n(a+1, n);
+        }
+    }
+};
 
 int main()
 {
@@ -186,12 +194,8 @@ int main()
 #ifdef LOCAL
     freopen("/Users/andrewwu/CLionProjects/cp-templates-cpp/input.txt", "r", stdin);
 #endif
-    cin >> t;
-    while(t--) {
-        cin >> n;
-        readint_n(a+1, n);
-        auto rank = iterableToRank(a+1, a+n+1, 1);
-        printint_n(all(rank));
-    }
+
+    solver().solve();
+    // solver().solve();
     return 0;
 }

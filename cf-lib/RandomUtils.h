@@ -8,6 +8,8 @@
 
 #include<vector>
 
+// srand((unsigned) time(0));
+
 int randInt(int lb, int ub) {return rand()%(ub-lb+1)+lb;}
 
 std::pair<int,int> randInterval(int l,int r) {
@@ -20,22 +22,13 @@ void printRandInterval(int l,int r) {
     printf("%d %d\n", interval.first, interval.second);
 }
 
-std::vector<std::vector<int>> generateCombination(int n, int k)
-{
-    std::vector<int> bitmask(k, 1); // k leading 1's
-    bitmask.resize(n, 0); // n-k trailing 0's
-    std::vector<std::vector<int>> combs;
-
-    // print integers and permute bitmask
-    do {
-        std::vector<int> cur_comb;
-        for (int i = 0; i < n; ++i) // [0..n-1] integers
-        {
-            if (bitmask[i]) cur_comb.push_back(i+1);
-        }
-        combs.push_back(cur_comb);
-    } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
-    return combs;
+std::vector<int> randCombination(int n, int k) {
+    std::vector<int> nums(n);
+    std::iota(all(nums), 0);
+    for(int i=0;i<n;++i) {
+        swap(nums[i], nums[i+ rand()%(n-i)]);
+    }
+    return {nums.begin(), nums.begin() + k};
 }
 
 #endif //CF_BASE_RANDOMUTILS_H

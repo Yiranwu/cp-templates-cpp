@@ -1,34 +1,23 @@
+//
+// Created by yiran on 2021/7/1.
+//
 #include<cstdio>
-#include<cassert>
-#include<vector>
+#include<random>
+#include<iostream>
+#include "cf-lib/RandomUtils.h"
 using namespace std;
-void findColumnName(int n) {
-    assert(n>=1);
-    --n;
-    int ndigits=0, cur_pow=1, cur_sum=0;
-    while(cur_sum + cur_pow*26 <=n) {
-        ++ndigits, cur_pow*=26;
-        cur_sum+=cur_pow;
-    }
-    printf("%c", (n-cur_sum)/cur_pow + 'A');
-    n=(n-cur_sum)%cur_pow; cur_pow/=26;
-    while(ndigits) {
-        printf("%c", n/cur_pow + 'A');
-        n%=cur_pow;
-        --ndigits, cur_pow/=26;
-    }
-    printf("\n");
-}
 
-int main()
-{
-    findColumnName(1);
-    findColumnName(26);
-    findColumnName(27);
-    findColumnName(52);
-    findColumnName(53);
-    findColumnName(26*3);
-    findColumnName(26*27);
-    findColumnName(26*27+1);
-    return 0;
+const int NP=80000, MAXV=1000000;
+int a[100000];
+bool flag[MAXV+5];
+
+int main() {
+    srand((unsigned) time(0));
+    freopen("/Users/andrewwu/CLionProjects/cp-templates-cpp/input.txt", "w", stdout);
+    int n=100;
+    printf("%d\n", n);
+    for(int i=1;i<=n;++i) {
+        for(int j=i;j<=n;++j) cout << 0 << " ";
+        cout << endl;
+    }
 }

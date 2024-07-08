@@ -5,8 +5,13 @@
 #ifndef CF_BASE_BIT_H
 #define CF_BASE_BIT_H
 
-// FenwickTree(int n, bool apply_mod)
+// FenwickTree(int n)
 // Construct bit on index 0..n-1
+// Point modification, range query
+
+// rangeSum(lb,ub): get sum of range [lb, ub)
+// add(pos, delta): add delta to position pos
+// set(pos, x): set position pos to x
 template <typename T>
 class FenwickTree {
 public:
@@ -47,6 +52,7 @@ public:
     }
 };
 
+// Range add, point query
 template<typename T>
 struct FenwickTreeDiff {
     FenwickTree<T> bit_diff;

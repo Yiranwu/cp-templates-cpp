@@ -32,6 +32,7 @@ public:
         }
     }
 
+    // Also find least prime factor fac[i] for composite i
     void findPrimeAndFactor() {
         fac.resize(n+1);
         for(int i=2;i<=n;++i) {
@@ -46,6 +47,21 @@ public:
                 if(i%pj==0) break;
             }
         }
+    }
+
+    // Handles factorization of v
+    // v range: n^2
+    mii factorize(ll v) {
+        mii ret;
+        for(auto &prime: p) {
+            if(v%prime!=0) continue;
+            while(v%prime==0) {
+                ++ret[prime];
+                v/=prime;
+            }
+        }
+        if(v>1) ++ret[v];
+        return ret;
     }
 };
 
