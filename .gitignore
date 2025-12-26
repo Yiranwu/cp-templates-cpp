@@ -33,13 +33,10 @@
 
 # Custom Files
 .idea/
-input.txt
 
-sol_checker.cpp
-uptodate.cpp
-cmake-build-debug/
 
 .DS_Store
 cmake-build-cf-main/
+cmake-build-debug/
 outputs/
-
+debugging/gt_sol.cpp
