@@ -4,6 +4,8 @@
 #ifndef CF_BASE_SEGMENTTREE_H
 #define CF_BASE_SEGMENTTREE_H
 
+#include "../template/cp_template.h"
+
 
 
 #define segtree_mid ((l+r)>>1)

@@ -2,6 +2,8 @@
 #ifndef CF_BASE_GCD_H
 #define CF_BASE_GCD_H
 
+#include "../template/cp_template.h"
+
 // Quick fact on number of divisors: The number is 1344 for integers up to 10^9 and 103680 for integers up to 10^18.
 // We can use O(n^(1/3)) as bound in general.
 // Source: https://codeforces.com/blog/entry/14463

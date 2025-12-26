@@ -89,4 +89,6 @@ public:
 
 #define CF_BASE_SIEVEOFEULER_H
 
+#include "../template/cp_template.h"
+
 #endif //CF_BASE_SIEVEOFEULER_H

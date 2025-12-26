@@ -5,6 +5,8 @@
 #ifndef CF_BASE_SCC_H
 #define CF_BASE_SCC_H
 
+#include "../template/cp_template.h"
+
 // solve scc
 // scc[x]: the scc id of x
 // S[y]: all element of scc y

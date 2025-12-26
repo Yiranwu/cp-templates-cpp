@@ -5,6 +5,8 @@
 #ifndef TIMING_H
 #define TIMING_H
 
+#include "../template/cp_template.h"
+
 
 auto start_time = std::chrono::high_resolution_clock::now();
 // op_to_time

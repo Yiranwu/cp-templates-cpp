@@ -5,6 +5,8 @@
 #ifndef CARTESIANTREE_H
 #define CARTESIANTREE_H
 
+#include "../template/cp_template.h"
+
 
 // Reference: https://codeforces.com/blog/entry/112664
 // Index is 1..n because we use 0 as soldier to prevent accessing nonexistent node

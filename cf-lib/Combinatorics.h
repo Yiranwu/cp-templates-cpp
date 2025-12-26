@@ -63,4 +63,6 @@ std::vector<std::vector<int>> getAllCombination(int n, int k)
 }
 #define CF_BASE_COMBINATORIALNUMBER_H
 
+#include "../template/cp_template.h"
+
 #endif //CF_BASE_COMBINATORIALNUMBER_H

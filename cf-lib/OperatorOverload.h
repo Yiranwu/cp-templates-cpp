@@ -5,6 +5,8 @@
 #ifndef CF_BASE_CUSTOMASSOCUTILS_H
 #define CF_BASE_CUSTOMASSOCUTILS_H
 
+#include "../template/cp_template.h"
+
 // Examples with functor
 
 set<obj, cmp> S;

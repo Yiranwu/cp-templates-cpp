@@ -5,6 +5,8 @@
 #ifndef CF_BASE_BINLIFTING_H
 #define CF_BASE_BINLIFTING_H
 
+#include "../template/cp_template.h"
+
 
 template <typename dataT>
 class GCDStats {

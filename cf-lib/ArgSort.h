@@ -5,6 +5,8 @@
 #ifndef CF_BASE_ARGSORT_H
 #define CF_BASE_ARGSORT_H
 
+#include "../template/cp_template.h"
+
 // Argsort
 // index_starts_with: output index start with this number
 template <typename iteratorT> auto argSort(iteratorT it_begin, iteratorT it_end, auto cmp=std::less<decltype(*it_begin)>(), int index_starts_with=0, bool decreasing=false) {

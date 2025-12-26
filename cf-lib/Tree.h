@@ -5,6 +5,8 @@
 #ifndef TREE_H
 #define TREE_H
 
+#include "../template/cp_template.h"
+
 // Node id start with 1
 class Tree {
 public:

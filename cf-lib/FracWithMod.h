@@ -5,6 +5,8 @@
 #ifndef FRACWITHMOD_H
 #define FRACWITHMOD_H
 
+#include "../template/cp_template.h"
+
 
 // One caveat: if frac = u*M / v*M, cannot directly add.
 // This can happen e.g., 1/2 + 3/M - 3/M = M / 2M.

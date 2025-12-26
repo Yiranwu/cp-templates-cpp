@@ -1,97 +1,236 @@
 import sys
 import os
 import re
+import json
+from collections import deque
 
-# Set of included files to prevent cycles and duplicates (implementing pragma once behavior)
-included_files = set()
+# Configuration
+DEFAULT_OUTPUT_DIR = "outputs"
+DEFAULT_CACHE_FILE = os.path.join(DEFAULT_OUTPUT_DIR, ".dependencies.json")
 
-def expand_file(filepath, output_lines):
-    # Resolve absolute path
-    abs_path = os.path.abspath(filepath)
-    if abs_path in included_files:
-        return
-    included_files.add(abs_path)
-    
-    if not os.path.exists(abs_path):
-        print(f"Error: File not found: {abs_path}")
-        return
+class DependencyManager:
+    def __init__(self, cache_file):
+        self.cache_file = cache_file
+        self.adj = {} # file -> list of included files (absolute paths)
+        self.files = set()
 
-    with open(abs_path, 'r') as f:
+    def scan_directory(self, root_dir):
+        """Scans a directory for .h and .cpp files and parses includes."""
+        root_dir = os.path.abspath(root_dir)
+        for dirpath, _, filenames in os.walk(root_dir):
+            for filename in filenames:
+                if filename.endswith(('.h', '.cpp', '.hpp')):
+                    filepath = os.path.join(dirpath, filename)
+                    self.parse_file(filepath)
+
+    def parse_file(self, filepath):
+        """Parses a single file for includes and updates the graph."""
+        filepath = os.path.abspath(filepath)
+        self.files.add(filepath)
+        
+        if filepath not in self.adj:
+            self.adj[filepath] = []
+            
+        if not os.path.exists(filepath):
+            return
+
+        with open(filepath, 'r') as f:
+            try:
+                content = f.read()
+            except UnicodeDecodeError:
+                return # Skip binary files if any
+
+        # Regex to match #include "..."
+        # We rely on the convention that library includes use quotes.
+        matches = re.findall(r'^\s*#include\s*"([^"]+)"', content, re.MULTILINE)
+        
+        current_dir = os.path.dirname(filepath)
+        
+        for include_path in matches:
+            # Resolve path
+            # Strategy: 
+            # 1. Relative to current file
+            # 2. Relative to project root (common in CP, e.g. "cf-lib/...")
+            
+            candidates = [
+                os.path.join(current_dir, include_path),
+                os.path.abspath(include_path) # Assumes include_path is relative to CWD (project root)
+            ]
+            
+            resolved = None
+            for cand in candidates:
+                cand = os.path.abspath(cand)
+                if os.path.exists(cand):
+                    resolved = cand
+                    break
+            
+            if resolved:
+                # Add edge: filepath depends on resolved
+                # Note: dependency direction. If A includes B, A depends on B.
+                # So to use B, we need B first.
+                # Edge: A -> B
+                if resolved not in self.adj[filepath]:
+                    self.adj[filepath].append(resolved)
+
+    def save_cache(self):
+        with open(self.cache_file, 'w') as f:
+            json.dump({'adj': self.adj}, f, indent=2)
+        print(f"Dependencies saved to {self.cache_file}")
+
+    def load_cache(self):
+        if not os.path.exists(self.cache_file):
+            return False
+        try:
+            with open(self.cache_file, 'r') as f:
+                data = json.load(f)
+                self.adj = data.get('adj', {})
+            return True
+        except:
+            return False
+
+    def get_dependencies(self, root_files):
+        """Returns a topologically sorted list of files required by root_files."""
+        # BFS/DFS to find all reachable nodes
+        visited = set()
+        queue = deque(root_files)
+        subgraph_nodes = set()
+        
+        while queue:
+            node = queue.popleft()
+            node = os.path.abspath(node)
+            if node in visited:
+                continue
+            visited.add(node)
+            subgraph_nodes.add(node)
+            
+            # If node is in our graph, add its children
+            if node in self.adj:
+                for child in self.adj[node]:
+                    queue.append(child)
+            else:
+                # If parsed file (like main.cpp) not yet in graph, parse it on the fly?
+                # Or relying on previous scan?
+                # For main.cpp, we usually parse it ad-hoc.
+                pass
+
+        # Topological Sort on subgraph
+        # Graph: A includes B => A->B
+        # Limit processing to subgraph_nodes
+        
+        # Calculate in-degrees (number of files including me)
+        # Wait, if A includes B, we need B before A.
+        # So in output order: B, then A.
+        # This is reverse topological sort if Edge is A->B.
+        # Or standard topo sort if Edge is Dependency->Dependent (B->A).
+        # Our adj is A->B (A includes B).
+        # So we want post-order DFS (visit children, then self).
+        
+        result = []
+        visited_sort = set()
+        temp_mark = set() # for cycle detection
+
+        def visit(n):
+            if n in visited_sort:
+                return
+            if n in temp_mark:
+                # Cycle detected
+                # In CP headers, #ifndef guards prevent infinite recursion, 
+                # but for hoisting, cycle is ambiguous. We just proceed.
+                return
+            
+            temp_mark.add(n)
+            
+            if n in self.adj:
+                for child in self.adj[n]:
+                    if child in subgraph_nodes:
+                        visit(child)
+            
+            temp_mark.remove(n)
+            visited_sort.add(n)
+            result.append(n)
+
+        for node in root_files:
+            visit(os.path.abspath(node))
+            
+        return result
+
+
+def process_file_content(filepath):
+    """Reads file and returns content with local includes stripped."""
+    with open(filepath, 'r') as f:
         lines = f.readlines()
     
-    # Check for #pragma once (simple check)
-    # If we relying on manual include guards, we might need more complex logic.
-    # But since we track 'included_files' manually, we effectively enforce #pragma once for everything expanded.
+    result = []
+    # Strip includes that use quotes #include "..."
+    # Keep others.
+    # Also strip #pragma once if present
     
     for line in lines:
-        # Match #include "..."
-        # We assume local includes use quotes. System includes use brackets.
-        # Regex to capture content in quotes
-        match = re.match(r'^\s*#include\s*"([^"]+)"', line)
-        if match:
-            include_path = match.group(1)
-            # Determine full path. Relative to current file directory.
-            # But the user might run this script from root.
-            # We assume include paths are either relative to the file or relative to project root.
-            # In CP templates, usually "cf-lib/..." is relative to project root.
-            # If the file is included as "cp_template.h" inside "cf-lib/", it refers to "cf-lib/cp_template.h".
-            
-            current_dir = os.path.dirname(abs_path)
-            candidate_path_rel = os.path.join(current_dir, include_path)
-            candidate_path_root = os.path.join(os.getcwd(), include_path)
-            
-            if os.path.exists(candidate_path_rel):
-                expand_file(candidate_path_rel, output_lines)
-            elif os.path.exists(candidate_path_root):
-                expand_file(candidate_path_root, output_lines)
-            else:
-                # Fallback: keep the line as is if file not found (maybe it's a specific local header not meant to be expanded?)
-                # Or print error.
-                print(f"Warning: Could not resolve include: {include_path} in {abs_path}")
-                output_lines.append(line)
-        else:
-            # Check for #pragma once. If found, ignore it, since we handle it logic side.
-            if re.match(r'^\s*#pragma\s+once', line):
-                continue
-            output_lines.append(line)
+        if re.match(r'^\s*#pragma\s+once', line):
+            continue
+        if re.match(r'^\s*#include\s*"[^"]+"', line):
+            # We assume these are the bundled libraries.
+            # Ideally we should check if they are in our dependency graph, 
+            # but stripping all quoted includes is a safe heuristic for CP templates 
+            # where all such includes are being bundled.
+            continue
+        result.append(line)
+        
+    return "".join(result)
+
 
 def main():
-    if len(sys.argv) > 1:
-        input_file = sys.argv[1]
+    import argparse
+    parser = argparse.ArgumentParser(description='Bundle C++ files with dependency management.')
+    parser.add_argument('input_file', nargs='?', default='main.cpp', help='Input file (default: main.cpp)')
+    parser.add_argument('output_file', nargs='?', help='Output file')
+    parser.add_argument('--scan', action='store_true', help='Force re-scan of dependencies')
+    parser.add_argument('--deps-file', default=DEFAULT_CACHE_FILE, help='Path to dependency cache file')
+    
+    args = parser.parse_args()
+    
+    input_file = os.path.abspath(args.input_file)
+    
+    if args.output_file:
+        output_file = args.output_file
     else:
-        input_file = "main.cpp"
+        if not os.path.exists(DEFAULT_OUTPUT_DIR):
+            os.makedirs(DEFAULT_OUTPUT_DIR)
+        output_file = os.path.join(DEFAULT_OUTPUT_DIR, "output.cpp")
+
+    manager = DependencyManager(args.deps_file)
+
+    # Step 1: Cache Loading / Scanning
+    if args.scan or not manager.load_cache():
+        print("Scanning dependencies...")
+        manager.scan_directory("cf-lib")
+        manager.scan_directory("template")
+        manager.save_cache()
     
-    if len(sys.argv) > 2:
-        output_file = sys.argv[2]
-    else:
-        # Default to outputs/output.cpp
-        output_dir = "outputs"
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        output_file = os.path.join(output_dir, "output.cpp")
+    # Step 2: Parse Main File Ad-hoc (to find roots)
+    # We must scan main.cpp to see what it includes. But we don't save main.cpp to cache usually.
+    manager.parse_file(input_file)
     
-    output_lines = []
-    # Clear included_files for fresh run (though script runs once)
-    included_files.clear()
+    # Step 3: Compute Order
+    # We want everything main.cpp depends on, ordered.
+    # The list returned by get_dependencies(X) ends with X.
+    # So dependencies come first.
     
-    # We want to process the input file, but NOT ignore it if we see it again? 
-    # Actually, the input file is the root.
-    # We shouldn't add input_file to included_files immediately if we want to allow it to be self-contained, 
-    # but normally we just expand it.
+    files_to_bundle = manager.get_dependencies([input_file])
     
-    # However, 'expand_file' checks included_files first. 
-    # So we call expand_file on input_file.
-    
-    expand_file(input_file, output_lines)
-    
-    content = "".join(output_lines)
-    
-    if output_file:
-        with open(output_file, 'w') as f:
-            f.write(content)
-        print(f"Generated {output_file}")
-    else:
-        print(content)
+    # Step 4: Generate Output
+    with open(output_file, 'w') as out:
+        # Add a header
+        out.write(f"// Bundled from {os.path.basename(input_file)}\n")
+        out.write("// Auto-generated by expand.py\n\n")
+        
+        for filepath in files_to_bundle:
+            out.write(f"// Start of {os.path.basename(filepath)}\n")
+            out.write(process_file_content(filepath))
+            out.write(f"\n// End of {os.path.basename(filepath)}\n\n")
+            
+    print(f"Generated {output_file}")
+
 
 if __name__ == "__main__":
     main()

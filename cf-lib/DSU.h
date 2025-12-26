@@ -5,6 +5,8 @@
 #ifndef CF_BASE_DSU_H
 #define CF_BASE_DSU_H
 
+#include "../template/cp_template.h"
+
 class DSU {
 public:
     vector<int> f;

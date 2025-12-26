@@ -5,6 +5,8 @@
 #ifndef CHUNKEDLINKEDLIST_H
 #define CHUNKEDLINKEDLIST_H
 
+#include "../template/cp_template.h"
+
 
 // Chunked linked list that maintains a ordered array of elements
 template<typename dataT>

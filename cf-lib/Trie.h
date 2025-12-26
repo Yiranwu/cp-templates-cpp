@@ -5,6 +5,8 @@
 #ifndef CF_BASE_TRIE_H
 #define CF_BASE_TRIE_H
 
+#include "../template/cp_template.h"
+
 class TrieIntKey {
 public:
     int value,n;

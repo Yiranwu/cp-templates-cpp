@@ -5,6 +5,8 @@
 #ifndef STRUCTUREDBINDINGNOTE_H
 #define STRUCTUREDBINDINGNOTE_H
 
+#include "../template/cp_template.h"
+
 // Structured binding to unpack values:
 auto [u, v] = make_tuple(3,4);
 

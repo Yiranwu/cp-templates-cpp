@@ -5,6 +5,8 @@
 #ifndef CF_BASE_GRAPHBASE_H
 #define CF_BASE_GRAPHBASE_H
 
+#include "../template/cp_template.h"
+
 class Edge {
 public:
     // id: id of edge

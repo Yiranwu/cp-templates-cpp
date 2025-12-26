@@ -5,6 +5,8 @@
 #ifndef CF_BASE_BIT_H
 #define CF_BASE_BIT_H
 
+#include "../template/cp_template.h"
+
 // FenwickTree(int n)
 // Construct bit on index 0..n
 // Point modification, range query

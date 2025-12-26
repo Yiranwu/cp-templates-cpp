@@ -6,6 +6,8 @@
 #ifndef CF_BASE_RANDOMUTILS_H
 #define CF_BASE_RANDOMUTILS_H
 
+#include "../template/cp_template.h"
+
 #include<vector>
 
 // srand((unsigned) time(0));

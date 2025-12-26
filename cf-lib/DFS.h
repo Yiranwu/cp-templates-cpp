@@ -5,6 +5,8 @@
 #ifndef CF_BASE_DFS_H
 #define CF_BASE_DFS_H
 
+#include "../template/cp_template.h"
+
 void dfs(int p,int fa) {
     father[p] = fa;
     for(edgeT s:T[p]) {

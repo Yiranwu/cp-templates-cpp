@@ -5,6 +5,8 @@
 #ifndef CF_BASE_TOPOLOGICALSORT_H
 #define CF_BASE_TOPOLOGICALSORT_H
 
+#include "../template/cp_template.h"
+
 // Sort vertices of directed graph topologically
 
 // this.Sort() returns false if their is loop

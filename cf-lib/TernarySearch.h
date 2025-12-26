@@ -5,6 +5,8 @@
 #ifndef TERNARYSEARCH_H
 #define TERNARYSEARCH_H
 
+#include "../template/cp_template.h"
+
 template <typename vT>
 vT ternary_search_int_maximize(std::function<vT(int)> fn, int L, int R) {
     using vT = ll;

@@ -5,6 +5,8 @@
 #ifndef CF_BASE_2SAT_H
 #define CF_BASE_2SAT_H
 
+#include "../template/cp_template.h"
+
 // 2SAT with n clauses, clause i true -> node 2*i, clause i false -> node 2*i+1
 // care: MAXN >= 2*n+10 should hold
 

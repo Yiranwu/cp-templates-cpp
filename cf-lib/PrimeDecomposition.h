@@ -5,6 +5,8 @@
 #ifndef CF_BASE_PRIMEDECOMPOSITION_H
 #define CF_BASE_PRIMEDECOMPOSITION_H
 
+#include "../template/cp_template.h"
+
 // remember to set sieve attribute with:
 // PrimeDcmpRational<intT>::sieve = xx
 template <typename intT>

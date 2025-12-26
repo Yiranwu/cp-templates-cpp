@@ -7,6 +7,8 @@
 #ifndef CF_BASE_BLOCKEDLIST_H
 #define CF_BASE_BLOCKEDLIST_H
 
+#include "../template/cp_template.h"
+
 class BlockedList{
 public:
     int block_size, list_size;

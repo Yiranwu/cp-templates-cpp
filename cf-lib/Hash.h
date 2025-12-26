@@ -5,6 +5,8 @@
 #ifndef CF_BASE_HASHING_H
 #define CF_BASE_HASHING_H
 
+#include "../template/cp_template.h"
+
 
 template<class T>
 class PairHash {

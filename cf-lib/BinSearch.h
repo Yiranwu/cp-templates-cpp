@@ -5,6 +5,8 @@
 #ifndef CF_BASE_BINSEARCH_H
 #define CF_BASE_BINSEARCH_H
 
+#include "../template/cp_template.h"
+
 // Always assumes L inclusive, R exclusive
 
 // Find first F in TTTTTFFFFF

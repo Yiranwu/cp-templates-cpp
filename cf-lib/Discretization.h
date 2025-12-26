@@ -5,6 +5,8 @@
 #ifndef CF_BASE_DISCRETIZATION_H
 #define CF_BASE_DISCRETIZATION_H
 
+#include "../template/cp_template.h"
+
 template <typename T> unordered_map<T, int> getDiscretizationMap(T it_begin, T it_end, int start_index=1) {
     unordered_map<T, int> M;
     int cnt=start_index;

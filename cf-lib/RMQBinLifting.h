@@ -5,6 +5,8 @@
 #ifndef CF_BASE_RMQBINLIFTING_H
 #define CF_BASE_RMQBINLIFTING_H
 
+#include "../template/cp_template.h"
+
 // RMQ with binary lifting
 // template<dataT, iterT>
 // Init (n, begin_iter, end_iter)

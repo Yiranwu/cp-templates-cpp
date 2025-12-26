@@ -5,6 +5,8 @@
 #ifndef CF_BASE_MODINTEGER_H
 #define CF_BASE_MODINTEGER_H
 
+#include "../template/cp_template.h"
+
 template <typename intT>
 class ModInteger {
 public:

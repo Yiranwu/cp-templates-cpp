@@ -4,6 +4,8 @@
 
 #ifndef CF_BASE_VECTORWITHOFFSET_H
 #define CF_BASE_VECTORWITHOFFSET_H
+
+#include "../template/cp_template.h"
 template <typename dataT>
 class vectorWithOffset {
 public:
