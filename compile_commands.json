@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/Users/yiranwu1997/CLionProjects/cp-templates-cpp",
+  "command": "/usr/local/opt/llvm/bin/clang++   -Wall -DLOCAL -fsanitize=address -fexperimental-library -std=gnu++2b -arch arm64 -o CMakeFiles/cf_main.dir/main.cpp.o -c /Users/yiranwu1997/CLionProjects/cp-templates-cpp/main.cpp",
+  "file": "/Users/yiranwu1997/CLionProjects/cp-templates-cpp/main.cpp",
+  "output": "CMakeFiles/cf_main.dir/main.cpp.o"
+}
+]

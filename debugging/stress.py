@@ -61,69 +61,76 @@ def main():
     
     # Compilation Command Construction
     # default fallback
-    default_cmd = ["g++", "-O2", "-std=c++20", "{src}", "-o", "{exe}", "-DLOCAL"]
-    
-    # Try to find compile_commands.json
-    compile_db_paths = [
-        "compile_commands.json",
-        "build/compile_commands.json",
-        "cmake-build-debug/compile_commands.json",
-        "cmake-build-release/compile_commands.json"
+    default_cmd = [
+        "/usr/local/opt/llvm/bin/clang++", 
+        "-Wall", 
+        "-DLOCAL", 
+        "-fsanitize=address", 
+        "-fexperimental-library", 
+        "-std=gnu++2b", 
+        "-arch", "arm64", 
+        "{src}", "-o", "{exe}"
     ]
     
+    # TIP: To use your CMake build settings:
+    # 1. Run the following command in your project root:
+    #    cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=1 .
+    # 2. This will generate a `compile_commands.json` file.
+    # 3. This script will automatically use the flags from that file.
+    
+    compile_db_path = "compile_commands.json"
+    
     found_cmd = None
-    for db_path in compile_db_paths:
-        if os.path.exists(db_path):
-            print(f"{GREEN}Found compile database at {db_path}{RESET}")
-            try:
-                import json
-                with open(db_path, 'r') as f:
-                    data = json.load(f)
-                    # Find command for the solution file
-                    # We look for an entry where 'file' ends with the solution filename
-                    sol_abs = os.path.abspath(args.sol)
-                    entry = next((e for e in data if os.path.abspath(e['file']) == sol_abs), None)
-                    
-                    if not entry and len(data) > 0:
-                        # Fallback: try to find ANY cpp file's flags if exact match fail
-                        entry = next((e for e in data if e['file'].endswith(".cpp")), None)
-                        if entry:
-                             print(f"{YELLOW}Exact match for {args.sol} not found in DB, using flags from {entry['file']}{RESET}")
-
+    if os.path.exists(compile_db_path):
+        print(f"{GREEN}Found compile database at {compile_db_path}{RESET}")
+        try:
+            import json
+            with open(compile_db_path, 'r') as f:
+                data = json.load(f)
+                # Find command for the solution file
+                # We look for an entry where 'file' ends with the solution filename
+                sol_abs = os.path.abspath(args.sol)
+                entry = next((e for e in data if os.path.abspath(e['file']) == sol_abs), None)
+                
+                if not entry and len(data) > 0:
+                    # Fallback: try to find ANY cpp file's flags if exact match fail
+                    entry = next((e for e in data if e['file'].endswith(".cpp")), None)
                     if entry:
-                        # Extract command
-                        # "command": "/usr/bin/c++ ... -o CMakeFiles/Target.dir/main.cpp.o -c /path/to/main.cpp"
-                        # We need to strip the input file, the output object, and '-c'
-                        raw_parts = entry['command'].split()
+                         print(f"{YELLOW}Exact match for {args.sol} not found in DB, using flags from {entry['file']}{RESET}")
+
+                if entry:
+                    # Extract command
+                    # "command": "/usr/bin/c++ ... -o CMakeFiles/Target.dir/main.cpp.o -c /path/to/main.cpp"
+                    # We need to strip the input file, the output object, and '-c'
+                    raw_parts = entry['command'].split()
+                    
+                    # Reconstruct command
+                    # 1. Compiler is first arg
+                    # 2. Filter out -o <obj>, -c <src>, and the src execution
+                    # 3. Add -DLOCAL if not present? (Usually Cmake has it)
+                    
+                    clean_cmd = []
+                    skip_next = False
+                    for part in raw_parts:
+                        if skip_next:
+                            skip_next = False
+                            continue
+                        if part == "-o":
+                            skip_next = True
+                            continue
+                        if part == "-c":
+                            continue
+                        if os.path.abspath(part) == os.path.abspath(entry['file']):
+                            continue
+                        clean_cmd.append(part)
                         
-                        # Reconstruct command
-                        # 1. Compiler is first arg
-                        # 2. Filter out -o <obj>, -c <src>, and the src execution
-                        # 3. Add -DLOCAL if not present? (Usually Cmake has it)
-                        
-                        clean_cmd = []
-                        skip_next = False
-                        for part in raw_parts:
-                            if skip_next:
-                                skip_next = False
-                                continue
-                            if part == "-o":
-                                skip_next = True
-                                continue
-                            if part == "-c":
-                                continue
-                            if os.path.abspath(part) == os.path.abspath(entry['file']):
-                                continue
-                            clean_cmd.append(part)
-                            
-                        # Now we have [compiler, flags...]
-                        # Add {src} to {exe} template
-                        clean_cmd.extend(["{src}", "-o", "{exe}"])
-                        found_cmd = clean_cmd
-                        print(f"{GREEN}Auto-detected flags: {' '.join(found_cmd)}{RESET}")
-                        break
-            except Exception as e:
-                print(f"{RED}Failed to parse compile_commands.json: {e}{RESET}")
+                    # Now we have [compiler, flags...]
+                    # Add {src} to {exe} template
+                    clean_cmd.extend(["{src}", "-o", "{exe}"])
+                    found_cmd = clean_cmd
+                    print(f"{GREEN}Auto-detected flags: {' '.join(found_cmd)}{RESET}")
+        except Exception as e:
+            print(f"{RED}Failed to parse compile_commands.json: {e}{RESET}")
 
     if found_cmd:
         compile_template = found_cmd
