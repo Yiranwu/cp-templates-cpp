@@ -20,7 +20,7 @@ public:
     vector<vector<dataT>> rangeMax;
 
     RMQBinLifting(iterT pbegin, iterT pend): n(pend-pbegin), V(pbegin, pend) {
-        maxp = log2(highbit(n));
+        maxp = log2i(highbit(n));
         rangeMax.resize(n);
         repin(i,0,n-1) {
             rangeMax[i].resize(maxp+1);
@@ -34,7 +34,7 @@ public:
     }
 
     dataT getRangeMax(int lb, int ub) {
-        int p = log2(highbit(ub-lb));
+        int p = log2i(highbit(ub-lb));
         return max(rangeMax[lb][p], rangeMax[ub-pow2(p)][p]);
     }
 };

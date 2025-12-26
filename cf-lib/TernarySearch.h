@@ -9,7 +9,7 @@
 
 template <typename vT>
 vT ternary_search_int_maximize(std::function<vT(int)> fn, int L, int R) {
-    using vT = ll;
+
     double EPS=1e-6;
 
     while (R-L>=3) {

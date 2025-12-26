@@ -6,6 +6,7 @@
 #define CF_BASE_PRIMEDECOMPOSITION_H
 
 #include "../template/cp_template.h"
+#include "LinearSieve.h"
 
 // remember to set sieve attribute with:
 // PrimeDcmpRational<intT>::sieve = xx
@@ -13,7 +14,7 @@ template <typename intT>
 class PrimeDcmpRational {
 public:
     typedef PrimeDcmpRational<intT> pdT;
-    static SieveOfEuler *sieve;
+    static LinearSieve *sieve;
     unordered_map<int,int> factors;
 
     explicit PrimeDcmpRational(intT numerator=1, intT denominator=1) {
@@ -91,7 +92,7 @@ public:
 };
 
 template <typename intT>
-SieveOfEuler* PrimeDcmpRational<intT>::sieve = &eulerSieve;
+LinearSieve* PrimeDcmpRational<intT>::sieve;
 
 typedef PrimeDcmpRational<ll> pdT;
 #endif //CF_BASE_PRIMEDECOMPOSITION_H

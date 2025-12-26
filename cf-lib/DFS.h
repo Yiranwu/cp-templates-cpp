@@ -7,13 +7,24 @@
 
 #include "../template/cp_template.h"
 
-void dfs(int p,int fa) {
-    father[p] = fa;
-    for(edgeT s:T[p]) {
-        int v=s.v;
-        if(v==fa) continue;
-        dfs(v, p);
+template <typename graphT>
+class GraphDFS {
+public:
+    const graphT &G;
+    vector<int> father;
+    
+    explicit GraphDFS(const graphT &_G): G(_G) {
+        father.resize(G.n + 1);
     }
-}
+
+    void dfs(int p, int fa) {
+        father[p] = fa;
+        for(auto& edge : G.G[p]) {
+            int v = edge.v; // Assuming edge has .v member
+            if(v == fa) continue;
+            dfs(v, p);
+        }
+    }
+};
 
 #endif //CF_BASE_DFS_H

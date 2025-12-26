@@ -8,12 +8,7 @@
 // We can use O(n^(1/3)) as bound in general.
 // Source: https://codeforces.com/blog/entry/14463
 
-template <typename T>
-T gcd(T a,T b) {
-    if(a==0)
-        return b;
-    return gcd(b%a,a);
-}
+
 
 template <typename T>
 T exgcd(T a, T b, T &x, T &y)
@@ -24,7 +19,7 @@ T exgcd(T a, T b, T &x, T &y)
         return b;
     }
     T x1, y1;
-    T gcd = gcdExtended(b % a, a, x1, y1);
+    T gcd = exgcd(b % a, a, x1, y1);
 
     x = y1 - (b / a) * x1;
     y = x1;

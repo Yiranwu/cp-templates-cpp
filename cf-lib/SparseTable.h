@@ -7,6 +7,9 @@
 
 #include "../template/cp_template.h"
 
+#include "VectorWithOffset.h"
+#include "GCD.h"
+
 
 template <typename dataT>
 class GCDStats {
@@ -48,7 +51,7 @@ public:
     int n,m;
     vectorWithOffset<vector<statsT>> stats;
 
-    explicit SparseTable(const vector<dataT> &_data, int _offset=1): n(_data.size()), m(log2(n)),
+    explicit SparseTable(const vector<dataT> &_data, int _offset=1): n(_data.size()), m(log2i(n)),
                                                                      stats(vector<vector<statsT>>(n), _offset) {
 
         for(int i=0;i<n;++i) {
@@ -63,7 +66,7 @@ public:
     }
 
     statsT rangeQuery(int l, int r) {
-        int p = log2int(r-l);
+        int p = log2i(r-l);
         return stats[l][p] + stats[r-pow2(p)][p];
     }
 

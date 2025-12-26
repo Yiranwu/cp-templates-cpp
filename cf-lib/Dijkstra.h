@@ -7,4 +7,6 @@
 
 #include "../template/cp_template.h"
 
+// TODO: Implement Dijkstra algo
+
 #endif //CF_BASE_DIJKSTRA_H

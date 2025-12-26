@@ -1,9 +1,11 @@
-//
-// Created by yiran on 2021/7/12.
-//
-#include "GCD.h"
 #ifndef CF_BASE_COMBINATORIALNUMBER_H
+#define CF_BASE_COMBINATORIALNUMBER_H
 
+#include "../template/cp_template.h"
+#include "GCD.h"
+
+inline ll QinvM(ll a) {return Qinv(a, M);}
+inline ll divM(ll a, ll b) {return a * QinvM(b) % M;}
 
 class CnkSolverWithFactorial {
 public:
@@ -40,7 +42,7 @@ ll Cnk(ll n, ll k) {
 ll Lucas(ll n, ll k)
 {
     if(k == 0) return 1;
-    return Cnk(n % p, k % p) * Lucas(n / p, k / p) % p;
+    return Cnk(n % M, k % M) * Lucas(n / M, k / M) % M;
 }
 
 
@@ -61,8 +63,5 @@ std::vector<std::vector<int>> getAllCombination(int n, int k)
     } while (std::prev_permutation(bitmask.begin(), bitmask.end()));
     return combs;
 }
-#define CF_BASE_COMBINATORIALNUMBER_H
-
-#include "../template/cp_template.h"
 
 #endif //CF_BASE_COMBINATORIALNUMBER_H

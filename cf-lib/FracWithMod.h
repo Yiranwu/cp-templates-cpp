@@ -6,6 +6,7 @@
 #define FRACWITHMOD_H
 
 #include "../template/cp_template.h"
+#include "LongLongWithMod.h"
 
 
 // One caveat: if frac = u*M / v*M, cannot directly add.

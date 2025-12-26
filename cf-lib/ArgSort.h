@@ -5,6 +5,8 @@
 #ifndef CF_BASE_ARGSORT_H
 #define CF_BASE_ARGSORT_H
 
+#include <ranges>
+#include <numeric>
 #include "../template/cp_template.h"
 
 // Argsort

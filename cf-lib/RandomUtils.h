@@ -7,6 +7,7 @@
 #define CF_BASE_RANDOMUTILS_H
 
 #include "../template/cp_template.h"
+#include <numeric>
 
 #include<vector>
 

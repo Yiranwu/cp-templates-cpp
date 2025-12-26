@@ -11,19 +11,21 @@ template <typename T> unordered_map<T, int> getDiscretizationMap(T it_begin, T i
     unordered_map<T, int> M;
     int cnt=start_index;
     for(T it = it_begin;it!=it_end;++it) {
-        if(M.find(*it)==M.end()) M[*it] = cnt++;
+        using valueT = typename std::iterator_traits<T>::value_type;
+        if(M.find((valueT)*it)==M.end()) M[*it] = cnt++;
     }
     return M;
 }
 template <typename T> void discretize(T *a, int n) {
-    unordered_map<T, T> M= get_discretize_map(a, n);
-    rep0(i,n) a[i] = M[a[i]];
+    auto M= getDiscretizationMap(a, a+n);
+    rep(i,0,n) a[i] = M[a[i]];
 }
-template <typename T> vector<int> applyDiscretizationMap(T it_begin, T it_end, int start_index=1, unordered_map<T, int> &M) {
-    vector<int> ret();
-    for(T it = it_begin;it!=it_end;++it) {
-        *it = M[*it];
+template <typename iterT> vector<int> applyDiscretizationMap(iterT it_begin, iterT it_end, unordered_map<typename std::iterator_traits<iterT>::value_type, int> &M, int start_index=1) {
+    vector<int> ret;
+    for(iterT it = it_begin;it!=it_end;++it) {
+        ret.push_back(M[*it]);
     }
+    return ret;
 }
 
 template <typename T>

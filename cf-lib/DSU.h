@@ -42,7 +42,7 @@ class DSUElementMembershipState {
     }
 
     // merge sx into sy
-    static void merge(DSUElementMembershipState &sx, DSUElementMembershipState &sy) {
+    static void merge(DSUElementMembershipState &sx, DSUElementMembershipState &sy, int w) {
         if(sx.members.size() > sy.members.size()) swap(sx,sy);
         sy.members.insert(sy.members.end(), sx.members.begin(), sx.members.end());
     }

@@ -8,7 +8,7 @@
 #include "../template/cp_template.h"
 
 // Node id start with 1
-class Tree {
+class GeneralTree {
 public:
     int n;
     vvi G;
@@ -19,7 +19,7 @@ public:
     // int d[MAXN], f[MAXN], fs[MAXN][MAXPOW+1], sz[MAXN];
 
 
-    explicit Tree(int n): n(n) {
+    explicit GeneralTree(int n): n(n) {
         G = vvi(n+1, vi());
         d = vi(n+1);
         f = vi(n+1);

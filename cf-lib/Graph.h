@@ -153,6 +153,7 @@ public:
     }
 };
 
+using graphDummyT = DirectedGraph<int>;
 using DummyTree = Tree<int>;
 
 #endif //CF_BASE_GRAPHBASE_H

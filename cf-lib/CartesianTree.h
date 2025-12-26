@@ -22,7 +22,7 @@ public:
 
         // pad 0 to vector to align with soldier position
         src.pb(0);
-        std::copy(my_all(_src), std::back_inserter(src));
+        std::copy(all(_src), std::back_inserter(src));
         _src.clear();
         root = 0;
         fa.resize(vSize);

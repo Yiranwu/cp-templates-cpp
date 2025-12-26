@@ -7,6 +7,7 @@
 
 #include "../template/cp_template.h"
 
+#if 0
 // Examples with functor
 
 set<obj, cmp> S;
@@ -49,6 +50,7 @@ set<obj, decltype(&objCmp)> S(objCmp);
 
 auto objCmpAuto = [](const obj &o1, const obj &o2) { return true; };
 set<obj, decltype(objCmpAuto)> S(objCmpAuto);
+#endif
 
 
 #endif //CF_BASE_CUSTOMASSOCUTILS_H

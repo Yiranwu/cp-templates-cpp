@@ -6,6 +6,7 @@
 #define CF_BASE_GRAPHCOLORING_H
 
 #include "../template/cp_template.h"
+#include "Graph.h"
 
 template <typename graphT>
 class GraphBiColoring {
@@ -35,11 +36,11 @@ public:
     }
 
     bool GetColor(int x) {
-        return colors[x-G.index_offset];
+        return colors[x-G.nodeOffset];
     }
 
     bool operator[] (int x) {
-        return colors[x-G.index_offset];
+        return colors[x-G.nodeOffset];
     }
 };
 

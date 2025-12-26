@@ -6,6 +6,7 @@
 #define CF_BASE_TOPOLOGICALSORT_H
 
 #include "../template/cp_template.h"
+#include "Graph.h"
 
 // Sort vertices of directed graph topologically
 

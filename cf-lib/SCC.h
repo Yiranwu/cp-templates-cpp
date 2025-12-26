@@ -6,6 +6,7 @@
 #define CF_BASE_SCC_H
 
 #include "../template/cp_template.h"
+#include "Graph.h"
 
 // solve scc
 // scc[x]: the scc id of x

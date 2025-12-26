@@ -1,8 +1,7 @@
-//
-// Created by yiran on 2021/7/11.
-//
-
 #ifndef CF_BASE_SIEVEOFEULER_H
+#define CF_BASE_SIEVEOFEULER_H
+
+#include "../template/cp_template.h"
 
 // LinearSieve: mark each composite x as not prime with its least prime factor
 // Suppose x=pq, will mark x when finding multiples of q, and considering prime factor p.
@@ -85,10 +84,5 @@ public:
         return ret;
     }
 };
-
-
-#define CF_BASE_SIEVEOFEULER_H
-
-#include "../template/cp_template.h"
 
 #endif //CF_BASE_SIEVEOFEULER_H

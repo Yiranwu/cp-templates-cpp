@@ -6,6 +6,7 @@
 #define CF_BASE_2SAT_H
 
 #include "../template/cp_template.h"
+#include "SCC.h"
 
 // 2SAT with n clauses, clause i true -> node 2*i, clause i false -> node 2*i+1
 // care: MAXN >= 2*n+10 should hold
@@ -21,7 +22,7 @@ public:
     explicit TwoSATSolver(int _n, graphT &G_): n(_n), G(G_) {}
 
     bool solve() {
-        TarjanSCC<edgeT, graphT> scc_solver(2*n+1, G);
+        TarjanSCC<graphT> scc_solver(2*n+1, G);
         scc_solver.solve();
         bool valid_flag=true;
         repin(i,1,n) {

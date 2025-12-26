@@ -6,6 +6,7 @@
 #define CF_BASE_HASHING_H
 
 #include "../template/cp_template.h"
+#include "LongLongWithMod.h"
 
 
 template<class T>
