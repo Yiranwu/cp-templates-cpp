@@ -6,60 +6,43 @@
 #define CF_BASE_ARGSORT_H
 
 // Argsort
-// vec: vector to sort
-// index_starts_with: the index of the first element of vector
-template <typename dataT> std::vector<int> argSort(vector<dataT> vec, int index_starts_with=0, bool decreasing=false) {
-    std::vector<int> indices(vec.size());
+// index_starts_with: output index start with this number
+template <typename iteratorT> auto argSort(iteratorT it_begin, iteratorT it_end, auto cmp=std::less<decltype(*it_begin)>(), int index_starts_with=0, bool decreasing=false) {
+    std::vector<int> indices(it_end - it_begin);
     std::iota(indices.begin(), indices.end(), index_starts_with);
-    if(!decreasing) {
-        std::sort(
-                indices.begin(), indices.end(),
-                [&](int a, int b)->bool { return vec[a-index_starts_with] < vec[b-index_starts_with]; }
-        );
-    }
-    else {
-        std::sort(
-                indices.begin(), indices.end(),
-                [&](int a, int b)->bool { return vec[a-index_starts_with] > vec[b-index_starts_with]; }
-        );
-
-    }
+    std::sort(
+            indices.begin(), indices.end(),
+            [&it_begin, &cmp, index_starts_with](int a, int b)->bool { return cmp(*(it_begin+b-index_starts_with), *(it_begin+a-index_starts_with)); }
+    );
     return indices;
 }
 
 
-// Argsort with iterator arguments
-// Haven't checked
-template <typename iteratorT> std::vector<int> argSort(iteratorT it_begin, iteratorT it_end, int index_starts_with=0) {
-    return argSort(vector<typename iteratorT::value_type>(it_begin, it_end), index_starts_with);
-}
-
-
 // Get rank of elements
-// Haven't checked
-template <typename dataT> std::vector<int> getRank(vector<dataT> V, int index_starts_with=0) {
-    auto argV = argSort(V);
-    vi rank(V.size());
-    for(size_t i=0;i<V.size();++i) {
-        rank[argV[i]]=i+index_starts_with;
+template <typename iterT> std::vector<int> getRank(iterT it_begin, iterT it_end, int index_starts_with=0, bool decreasing=false) {
+    auto argV = argSort(it_begin, it_end, index_starts_with, decreasing);
+    vi rank(it_end - it_begin);
+    for(size_t i=0;i<rank.size();++i) {
+        rank[argV[i]-index_starts_with]=i+index_starts_with;
     }
     return rank;
 }
 
 
-// Rearrange V based on increasing order of Vindex.
-// e.g., if Vindex = {1,0,2}, return = {V[1], V[0], V[2]}
+
+
+// Rearrange V based on a permutation of index.
+// e.g., if perm = {1,0,2}, return = {V[1], V[0], V[2]}
 // If index is already 0..n-1, set indexToRank = false.
 template <typename dataT, typename indexT>
-vector<dataT> rearrangeByIndexRank(vector<dataT> V, vector<indexT> Vindex, bool indexToRank=false) {
-    assert(V.size() == Vindex.size());
+vector<dataT> rearrangeWithPerm(vector<dataT> V, vector<indexT> perm) {
+    assert(V.size() == perm.size());
 
-    auto& rank = indexToRank ? getRank(Vindex) : Vindex;
     vector<dataT> ret(V.size());
     // change to views::enumerate later
     // clang do not support enumerate as of now
     for(auto i: views::iota(0, V.size())) {
-        ret[rank[i]] = V[i];
+        ret[i] = V[perm[i]];
     }
     return ret;
 }

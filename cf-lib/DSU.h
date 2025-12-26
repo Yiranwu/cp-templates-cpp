@@ -13,50 +13,74 @@ public:
         f.reserve(size+1);
         repin(i,0,size) f.pb(i);
     }
-    int father(int idx) {
+    int find(int idx) {
         if(f[idx]==idx) return idx;
-        return f[idx]=father(f[idx]);
+        return f[idx]=find(f[idx]);
     }
-    int joinSelf(int i1, int i2) {
+    int mergeSelf(int i1, int i2) {
         return f[i1]=i2;
     }
-    int joinFather(int i1, int i2){
-        if(!inSameSet(i1,i2)) return joinSelf(f[i1],f[i2]);
+    int merge(int i1, int i2){
+        if(!equal(i1,i2)) return mergeSelf(f[i1],f[i2]);
         return -1;
     }
-    bool inSameSet(int i1, int i2) {
-        return father(i1)==father(i2);
+    bool equal(int i1, int i2) {
+        return find(i1)==find(i2);
     }
 };
 
-class DSUWithMember {
-public:
-    vector<int> f;
-    vector<vector<int>> members;
-    vector<vector<int>*> p;
-    explicit DSUWithMember(int size) {
-        f.clear(); members.clear(); p.clear();
-        f.reserve(size+1); members.reserve(size+1); p.reserve(size+1);
-        repin(i,0,n) f.pb(i), members.pb({i}), p.pb(&members[i]);
+class DSUElementMembershipState {
+    vector<int> members;
+
+    DSUElementMembershipState(): members() {}
+    explicit DSUElementMembershipState(int x): members{x} {}
+
+    void addMember(int member) {
+        members.pb(member);
     }
-    int father(int idx) {
-        if(f[idx]==idx) return idx;
-        return f[idx]=father(f[idx]);
-    }
-    int joinSelf(int i1, int i2) {
-        f[i1]=i2;
-        int i_fa = p[i1]->size()>p[i2]->size()?i1:i2, i_son=i_fa^i1^i2;
-        p[i_fa]->insert(p[i_fa]->end(), p[i_son]->begin(), p[i_son]->end());
-        p[i2] = p[i_fa];
-        return i2;
-    }
-    int joinFather(int i1, int i2) {
-        if(!inSameSet(i1,i2)) return joinSelf(f[i1],f[i2]);
-        return -1;
-    }
-    bool inSameSet(int i1, int i2) {
-        return father(i1)==father(i2);
+
+    // merge sx into sy
+    static void merge(DSUElementMembershipState &sx, DSUElementMembershipState &sy) {
+        if(sx.members.size() > sy.members.size()) swap(sx,sy);
+        sy.members.insert(sy.members.end(), sx.members.begin(), sx.members.end());
     }
 };
+
+// DSUWithState
+// init(n)
+//   n: number of elements assuming element starts from 1
+// find(x): find representative element of set having x
+// merge(x, y): merge set of x into set of y
+template<class stateT>
+class DSUWithState {
+public:
+    vector<int> f;
+    vector<stateT> states;
+    int n;
+
+    explicit DSUWithState(int _n): n(_n), f(), states() {
+        f.reserve(n+1); states.reserve(n+1);
+        repin(i,0,n) f.pb(i), states.pb(stateT());
+    }
+    int find(int idx) {
+        if(f[idx]==idx) return idx;
+        return f[idx]=find(f[idx]);
+    }
+    int mergeSelf(int i1, int i2, int w) {
+        f[i1]=i2;
+        stateT::merge(states[i1], states[i2], w);
+        return i2;
+    }
+    int merge(int i1, int i2, int w) {
+        if(!equal(i1,i2)) return mergeSelf(f[i1],f[i2], w);
+        return -1;
+    }
+    bool equal(int i1, int i2) {
+        return find(i1)==find(i2);
+    }
+};
+
+using DSUStateT = DSUElementMembershipState;
+using DSUWithStateT = DSUWithState<DSUStateT>;
 
 #endif //CF_BASE_DSU_H

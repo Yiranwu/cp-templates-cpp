@@ -3,8 +3,14 @@ Create a workflow of testing: datagen write to fstream -> file reads from that s
 Implement a system that automatically runs datagen and solution, and report wrong answer.
 Write some random utilities in datagen to accelerate it.
 Finish binary lifting template
-Modify trie
 argrank?
 make graph easier to use
 argsort rename
 argsort apply argsort
+
+implement a variadic template function to print list of elements separated by empty space
+dijkstra and assert no circle in graph
+
+Balanced tree, ref problem: https://codeforces.com/contest/2053/problem/D
+
+unordered_map of pairs, custom hash function

@@ -77,11 +77,14 @@ const int Max_MaxNode<int> :: INVALID = INT_MIN;
 template<>
 const ll Max_MaxNode<ll> :: INVALID = ll(INT_MIN);
 
+template <typename dataT>
 class Add_MinMaxNode {
 public:
-    int add_tag, data_min, data_max;
-    Add_MinMaxNode(): add_tag(0), data_min(0), data_max(0) {};
+    dataT add_tag, data_min, data_max;
+    Add_MinMaxNode(): add_tag(dataT()), data_min(dataT()), data_max(dataT()) {}
     Add_MinMaxNode(int _add_tag, int _data_min, int _data_max): add_tag(_add_tag), data_min(_data_min), data_max(_data_max) {}
+    static Add_MinMaxNode from_value(dataT value) {return {dataT(), value, value};}
+    static Add_MinMaxNode from_tag(dataT tag) {return {tag, dataT(), dataT()};}
     bool tagged() {return add_tag;}
     void tag(int root, int l, int r, Add_MinMaxNode &tagNode) {
         add_tag+=tagNode.add_tag;
@@ -94,8 +97,9 @@ public:
         data_max = max(lnode.data_max, rnode.data_max);
     }
 };
-inline Add_MinMaxNode operator + (const Add_MinMaxNode& lhs, const Add_MinMaxNode& rhs){
-    return Add_MinMaxNode(0, min(lhs.data_min, rhs.data_min), max(lhs.data_max, rhs.data_max));
+template <typename dataT>
+inline Add_MinMaxNode<dataT> operator + (const Add_MinMaxNode<dataT>& lhs, const Add_MinMaxNode<dataT>& rhs){
+    return {0, min(lhs.data_min, rhs.data_min), max(lhs.data_max, rhs.data_max)};
 }
 
 

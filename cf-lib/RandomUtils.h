@@ -10,7 +10,7 @@
 
 // srand((unsigned) time(0));
 
-int randInt(int lb, int ub) {return rand()%(ub-lb+1)+lb;}
+int randInt(int lb, int ub) {return rand()%(ub-lb)+lb;}
 
 std::pair<int,int> randInterval(int l,int r) {
     int x=randInt(l,r), y=randInt(l,r);

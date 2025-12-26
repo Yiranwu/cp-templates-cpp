@@ -14,7 +14,6 @@
 #pragma GCC optimize ("unroll-loops")
 #include<cstdio>
 #include<iostream>
-#include<fstream>
 #include<iomanip>
 #include<cstring>
 #include<utility>
@@ -39,7 +38,6 @@
 #include<type_traits>
 #include<stdexcept>
 #include<any>
-#include<functional>
 
 // clang does not support some of c++20 features officially
 // need compiler option -fexperimental-library
@@ -48,7 +46,6 @@
 #include<bit>
 #include<bitset>
 #include <complex>
-#include <regex>
 
 using namespace std;
 #define mp make_pair
@@ -60,7 +57,14 @@ using namespace std;
 #define repin(i,l,r) for(int i=l;i<=r;++i)
 #define rrep(i,r,l) for(int i=r;i>l;--i)
 #define rrepin(i,r,l) for(int i=r;i>=l;--i)
-#define all(data) (data).begin(), (data).end()
+#define modM(a) (((a)%M+M)%M)
+#define addM(a,b) ((modM(a) + modM(b))%M)
+#define subM(a,b) (modM(modM(a) - modM(b)))
+#define multM(a,b) (modM(modM(a) * modM(b)))
+#define divM(a,b) (multM(a, Qinv(b,M)))
+#define QinvM(a) (Qinv(a,M))
+#define QpowM(a,b) (Qpow(a,b,M))
+#define my_all(data) (data).begin(), (data).end()
 #define println() printf("\n")
 #define endlCh '\n'
 #define usafe_at(arr, i, val) ((i)>=(arr).size()? (val) : ((arr)[i]))
@@ -75,16 +79,9 @@ template<typename valueT>
 using pair_t = pair<valueT,valueT>;
 using pii = pair<int,int>;
 using vi = vector<int>;
-using vl = vector<ll>;
-using vpii = vector<pii>;
 template <typename valueT>
 using vv_t = vector<vector<valueT>>;
-using vvi = vector<vector<int>>;
 using mii = map<int,int>;
-template<typename valueT>
-using pq = priority_queue<valueT>;
-template<typename valueT>
-using pq_rev = priority_queue<valueT, vector<valueT>, greater<>>;
 
 // io utils
 
@@ -95,14 +92,15 @@ using pq_rev = priority_queue<valueT, vector<valueT>, greater<>>;
 //     for(;isdigit(c);c=getchar())x=x*10+(c-'0');
 //     x*=f;
 // }
-template <typename T> void read_all(T &x) {cin >> x;}
-template <typename T, typename... Ts> void read_all(T &x, Ts&... xs) {read_all(x); read_all(xs...);}
-template <typename T> void read_range(T pbegin, T pend)  {for(auto p=pbegin;p!=pend;++p) cin>>*p;}
-template <typename T> void read_n(T *a, int n) {for(int i=0;i<n;++i) cin>>a[i];}
-template <typename T> void read_n(vector<T> &a, int n) {T tmp; a.pb(T()); for(int i=0;i<n;++i) cin>>tmp, a.pb(tmp);}
-template <typename T> void print_all(T &x) {cout << x;}
-template <typename T, typename... Ts> void print_all(T &x, Ts&... xs) {cout << x << ' '; print_all(xs...);}
-template <typename T> void print_range(T pbegin, T pend)  {for(auto p=pbegin;p!=pend;++p) cout<<*p<<' '; cout<<'\n';}
+template <typename T> void read(T &x) {cin >> x;}
+template <typename T, typename... Ts> void read(T &x, Ts&... xs) {read(x); read(xs...);}
+template <typename T> void readint(T pbegin, T pend)  {for(auto p=pbegin;p!=pend;++p) cin>>*p;}
+template <typename T> void readint_n(T *a, int n) {for(int i=0;i<n;++i) cin>>a[i];}
+template <typename T> void readint_n(vector<T> &a, int n) {T tmp; a.pb(T()); for(int i=0;i<n;++i) cin>>tmp, a.pb(tmp);}
+template <typename T> void readint_n_with_n(T *a, int &n) {cin>>n; readint_n(a, n);}
+template <typename T> void readint_n_with_n(vector<T> &a, int &n) {cin>>n; readint_n(a, n);}
+template <typename T> void printint(T pbegin, T pend, char *format)  {for(auto p=pbegin;p!=pend;++p) printf(format, *p); printf("\n");}
+template <typename T> void printint(T pbegin, T pend)  {for(auto p=pbegin;p!=pend;++p) cout<<*p<<' '; cout<<'\n';}
 
 // Shortcuts or named popular ops
 template <typename T> void chkmax(T &x,T y){x<y?x=y:T();}
@@ -159,8 +157,8 @@ template <typename T> void mergeContainerInPlace(T& c1, const T& c2) {
 template <typename T> T mergeContainer(const T& c1, const T& c2) {
     T ret;
     ret.reserve(c1.size()+c2.size());
-    std::copy(all(c1), std::back_inserter(ret));
-    std::copy(all(c2), std::back_inserter(ret));
+    std::copy(my_all(c1), std::back_inserter(ret));
+    std::copy(my_all(c2), std::back_inserter(ret));
     return ret;
 }
 template <typename T> auto toBlockRepresentation(T pbegin, T pend) {
@@ -197,16 +195,12 @@ template <typename vT, typename checkT> ll binsearchFirstFalse(ll L, ll R, check
 }
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count()+1);
 
-
-
 /*
 class solver {
 public:
     int t=0;
-    int n=0,m;
+    int n=0;
     int a[MAXN];
-    string s;
-    vvi G;
 
     explicit solver() {
     }
@@ -214,52 +208,128 @@ public:
     void solve() {
         cin >> t;
         while(t--) {
-            cin >> n >> m;
-            read_range(a+1,a+n+1);
+            cin >> n;
+            readint_n(a+1, n);
         }
     }
 };
-*/
+ */
 
 const int H=23333;
-const ll M=998244353;
-//const ll M = 1000000007;
+//const ll M=998244353;
+const ll M = 1000000007;
+
 const int MAXN = 500005;
-const int MAXM = 505;
-const int MAXP = 32;
-// 0x7f
 
 class solver {
 public:
     int t=0;
-    int n=0,m;
-    ll a[MAXN];
-    string s;
-    vvi G;
+    int n=0,m=0;
+    vv_t<pii> G={};
+    bool visit[MAXN], ban[MAXN];
+    bool backtrack=false;
+    vv_t<int> ans;
+    int root=0;
+    vector<pii> forest;
+    stack<int> vstack;
 
     explicit solver() {
     }
 
+    int dfs(int x, int fa, int mfa) {
+        visit[x]=true;
+        vstack.push(x);
+        int some_son=-1;
+        vi visit_son;
+        for(auto [y, mid]: G[x]) {
+            if(ban[mid]) continue;
+            if(visit[y]) {
+                if(y==fa) continue;
+                root=y;
+                backtrack=true;
+                ban[mid]=true;
+            }
+            if(!backtrack) dfs(y, x, mid);
+            if(backtrack) {
+                if(x==root) {
+                    backtrack=false;
+                    while(vstack.top()!=root) {
+                        visit[vstack.top()]=false;
+                        vstack.pop();
+                    }
+                }
+                else {
+                    //visit[x]=false;
+                    ban[mfa]=true;
+                    if(fa!=root) ans.pb({root, x,fa});
+                    //for(auto [y2, mid2]: G[x]) visit[y2]=false;
+                    return -1;
+                }
+            }
+            some_son=y;
+        }
+        return some_son;
+    }
+
+    void answer() {
+        cout << ans.size() << endl;
+        for(auto &v: ans) {
+            cout << v[0] << ' ' << v[1] << ' ' << v[2] << endl;
+        }
+    }
+
     void solve() {
-        vector<int> V;
-        V.push_back(1);
-        V.push_back(2);
-        map<int,int> M;
-        M[1]=2;
-        M[2]=4;
+        cin >> t;
+        while(t--) {
+            cin >> n >> m;
+            fill(visit, visit+n+1, false);
+            fill(ban, ban+m+1, false);
+            G = vv_t<pii>(n+1, vector<pii>());
+            forest = vector<pii>();
+            ans = vv_t<int>();
+            vstack = stack<int>();
+            repin(i,1,m) {
+                int x,y;
+                cin >> x >> y;
+                G[x].pb({y, i});
+                G[y].pb({x, i});
+            }
+            repin(i,1,n) {
+                backtrack=false;
+                if(!visit[i]) {
+                    int some_son = dfs(i,0,0);
+                    forest.pb({i, some_son});
+                }
+            }
+            if(forest.size()==1 || forest.size()==n) answer();
+            else {
+                pii merge_root={-1,-1};
+                for(auto f: forest) {
+                    if(f.y!=-1) merge_root=f;
+                }
+                assert(merge_root.x !=-1);
+                int skip_root = merge_root.x;
+
+                for(auto f: forest) {
+                    if(f.x==skip_root) continue;
+                    ans.pb({merge_root.x, merge_root.y, f.x});
+                    merge_root = {f.x, merge_root.x};
+                }
+                answer();
+            }
+        }
     }
 };
-
 
 int main()
 {
     ios::sync_with_stdio(false); cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("/Users/yiranwu1997/CLionProjects/cp-templates-cpp/input.txt", "r", stdin);
+    freopen("/Users/andrewwu/CLionProjects/cp-templates-cpp/input.txt", "r", stdin);
 #endif
-    //freopen("/Users/yiranwu1997/CLionProjects/cp-templates-cpp/output.txt", "w", stdout);
+    //freopen("/Users/andrewwu/CLionProjects/cp-templates-cpp/output.txt", "w", stdout);
 
     auto mysolver = solver();
     mysolver.solve();
-
+    return 0;
 }

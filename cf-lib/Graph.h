@@ -20,11 +20,11 @@ template <typename dataT>
 class GraphBase {
 public:
 
-    int n,m,nodeSize;
+    int n,m, nodeOffset, nodeSize;
     vector<vector<Edge>> G;
     vector<dataT> Edata;
 
-    explicit GraphBase(int _n, int _m) : n(_n), m(_m), nodeSize(n+1) {
+    explicit GraphBase(int _n, int _m, int _nodeOffset=1) : n(_n), m(_m), nodeOffset(_nodeOffset), nodeSize(n+nodeOffset) {
         G.resize(nodeSize);
         Edata.reserve(m);
     }
@@ -42,6 +42,7 @@ public:
         int x,y;
         for(int i=0;i<m;++i) {
             cin >> x >> y;
+            x-=nodeOffset; y-=nodeOffset;
             addDummyEdge(x,y);
         }
     }
@@ -51,6 +52,7 @@ public:
         dataT edgeData;
         for(int i=0;i<m;++i) {
             cin >> x >> y;
+            x-=nodeOffset; y-=nodeOffset;
             cin >> edgeData;
             addEdge(x,y, edgeData);
         }
@@ -75,7 +77,7 @@ template <typename dataT>
 class UndirectedGraph: public GraphBase<dataT> {
 public:
 
-    UndirectedGraph(int _n, int _m): GraphBase<dataT>(_n, _m) {}
+    UndirectedGraph(int _n, int _m, int _nodeOffset=1): GraphBase<dataT>(_n,_m,_nodeOffset) {}
 
     void addEdge(int x, int y, dataT data) override {
         this->appendEdge(x,y,this->Edata.size());
@@ -88,8 +90,23 @@ template <typename dataT>
 class Tree: public UndirectedGraph<dataT> {
 public:
     vector<int> f,d,sz;
+    using baseT = UndirectedGraph<dataT>;
 
-    explicit Tree(int _n): UndirectedGraph<dataT>(_n,_n-1) {}
+    explicit Tree(int _n, int _nodeOffset=1): baseT(_n,_n-1, _nodeOffset) {
+        f.resize(this->nodeSize);
+        d.resize(this->nodeSize);
+        sz.resize(this->nodeSize);
+    }
+
+    // 0 is always the root
+    // read n-1 numbers, p1...pn-1, pi number is ancestor of vertex i
+    void readTreeWithDummyEdgeByAncestors() {
+        int x,y;
+        for(int i=1;i<baseT::n;++i) {
+            cin >> x;
+            baseT::addDummyEdge(x-baseT::nodeOffset,i);
+        }
+    }
 
     void _dfs(int root, int fa, int depth) {
         f[root]=fa;
@@ -104,9 +121,6 @@ public:
     }
 
     void dfs(int root) {
-        f.resize(this->nodeSize);
-        d.resize(this->nodeSize);
-        sz.resize(this->nodeSize);
         _dfs(root, -1, 1);
     }
 

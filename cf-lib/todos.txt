@@ -2,3 +2,8 @@ SegTree
 Prime factor dcmp
 Heavy light dcmp
 Link cut tree
+
+In C++, if we have unordered_set<int> P[2], how do we write decltype for a variable holding ptr to P[0] or P[1]?
+
+optimize compile time
+make tree class easier to use: write a function that populates G[tree]

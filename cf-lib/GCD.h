@@ -2,6 +2,10 @@
 #ifndef CF_BASE_GCD_H
 #define CF_BASE_GCD_H
 
+// Quick fact on number of divisors: The number is 1344 for integers up to 10^9 and 103680 for integers up to 10^18.
+// We can use O(n^(1/3)) as bound in general.
+// Source: https://codeforces.com/blog/entry/14463
+
 template <typename T>
 T gcd(T a,T b) {
     if(a==0)

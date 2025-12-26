@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 project(cf_base)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(use_gcc_flag OFF)
 if(use_gcc_flag)
     # gcc do not support address sanitizer on arm64 architecture
@@ -11,12 +11,11 @@ else()
     # Use brew installed compilers because system compilers are lagged in version
     set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
     set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
-    include_directories(SYSTEM ./lib)
 endif()
 
 # If debugging, may need to skip some flags.
 # Had experience of watches not working before turning flags off.
-set(debug_flag OFF)
+set(debug_flag ON)
 
 if(use_gcc_flag)
     # Use only for resolving codeforces CE due to discrepancy of local and remote env
@@ -39,7 +38,6 @@ endif()
 
 add_executable(cf_main main.cpp)
 set_target_properties(cf_main PROPERTIES LINK_FLAGS -Wl,-stack_size,10240000)
-
 #add_executable(cf_checker sol_checker.cpp cf-lib/SegmentTree.h cf-lib/BlockedList.h)
 
 #add_executable(cf_datagen generate_test_case.cpp)

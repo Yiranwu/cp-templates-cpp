@@ -4,10 +4,114 @@
 #ifndef CF_BASE_SEGMENTTREE_H
 #define CF_BASE_SEGMENTTREE_H
 
-#include<vector>
-#include<algorithm>
 
-// TODO: decouple M and Q
+
+#define segtree_mid ((l+r)>>1)
+#define segtree_lson (root<<1)
+#define segtree_rson (root<<1|1)
+
+class SegTree {
+public:
+    int n;
+    vector<int> tree;
+
+    explicit SegTree(int n): n(n) {
+        tree.resize((n+1)*4);
+        buildTree(1,1,n);
+    }
+
+    void buildTree(int root, int l, int r) {
+        if(l==r) {
+            tree[root] = 0;
+            return;
+        }
+        buildTree(segtree_lson, l, segtree_mid);
+        buildTree(segtree_rson, segtree_mid + 1, r);
+        pushUp(root, l, r);
+    }
+
+    void pushUp(int root, int l, int r) {
+        tree[root] = max(tree[segtree_lson], tree[segtree_rson]);
+    }
+
+    void updateRange(int root, int l, int r, int x, int y, int v) {
+        if(x<=l && r<=y) {
+            chkmax(tree[root], v);
+            return;
+        }
+
+        if(x <= segtree_mid) updateRange(segtree_lson, l, segtree_mid, x, y, v);
+        if(y >= segtree_mid + 1) updateRange(segtree_rson, segtree_mid + 1, r, x, y, v);
+        pushUp(root, l, r);
+    }
+
+    int query(int root, int l, int r, int x) {
+        if (l==r) return tree[root];
+
+        if (x<= segtree_mid) return query(segtree_lson, l, segtree_mid, x);
+        else return query(segtree_rson, segtree_mid + 1, r, x);
+    }
+};
+
+class SegTree2d {
+public:
+    int n,m;
+    vector<SegTree> tree;
+    vector<int> tag;
+
+    explicit SegTree2d(int n, int m): n(n), m(m) {
+        tree.reserve((n+1)*4);
+        tag.resize(n+1);
+        buildTree(1,1,n);
+    }
+
+    void buildTree(int root, int l, int r) {
+        if(l==r) {
+            tree.emplace_back(m);
+            tag[root] = 0;
+            return;
+        }
+        buildTree(segtree_lson, l, segtree_mid);
+        buildTree(segtree_rson, segtree_mid + 1, r);
+        pushUp(root, l, r);
+    }
+
+    void pushUp(int root, int l, int r) {
+        tree[root] = max(tree[segtree_lson], tree[segtree_rson]);
+    }
+
+    void updateRange(int root, int l, int r, int lx, int rx, int ly, int ry, int v) {
+        if(lx<=l && r<=rx) {
+            tree[root].updateRange(1,1,m,ly,ry,v);
+            return;
+        }
+
+        if(lx <= segtree_mid) updateRange(segtree_lson, l, segtree_mid, lx, rx, ly, ry, v);
+        if(rx >= segtree_mid + 1) updateRange(segtree_rson, segtree_mid + 1, r, lx, rx, ly, ry, v);
+        pushUp(root, l, r);
+    }
+
+    int query(int root, int l, int r, int x, int y) {
+        if (l==r) return tree[root].query(1,1,m,y);
+
+        if (x<= segtree_mid) return query(segtree_lson, l, segtree_mid, x, y);
+        else return query(segtree_rson, segtree_mid + 1, r, x, y);
+    }
+};
+
+
+
+// Some discussion regarding the design of M_QNode:
+// In a lazy segtree, we need to support range update (M) and range query (Q).
+// On each segtree node, we need to store a tag field for each M op, and a data field for each Q op.
+
+// During a range update, we will apply a series of M ops to segtree nodes.
+//   Each M op will potentially change multiple tag fields and multiple data fields.
+//   The final result of data on a segtree node is: MOpZ( MOpY( ... MOpA(data) ) )
+//   So there's a natural precedence of operators. Higher priority op will change tag of lower prio op, but not in the opposite direction.
+
+// During a range query, we will merge data fields of each requested Q op from segtree nodes.
+
 // TODO: support LazySegTree(vector<int/ll>) and M_QNode(int/ll) so that we can init segtree directly from array/vector
 
 //need a node class that supports
@@ -20,13 +124,16 @@ template <typename valueT>
 class M_QNode {
 public:
     //data member here
-    M_QNode() = default;
+    int member;
     // constructor here
+    M_QNode() {}
+    M_QNode(int _member()) {}
+    static M_QNode from_value(valueT value) {return {valueT(), value, value};}
+    static M_QNode from_tag(valueT tag) {return {tag, valueT(), valueT()};}
     bool tagged() {}
     bool superiorThan(M_QNode &other) {}
     void tag(int root, int l, int r, M_QNode &tagNode) {
         if(!tagNode.superiorThan(this)) return;
-
     }
     void untag() {}
     void pushUp(int root, int l, int r, M_QNode &lnode, M_QNode &rnode) {
@@ -54,61 +161,43 @@ public:
     vector<int> p2index;
 
     void init() {
-        tree.resize(n*4);
-        p2index.resize(n*4);
+        tree.resize((n+1)*4);
+        p2index.resize((n+1)*4);
     }
 
     explicit LazySegmentTree(int _n): n(_n) {
         init();
-        vector<nodeT> node_data;
-        node_data.resize(n);
-        build(node_data);
-    }
-
-    explicit LazySegmentTree(const vector<nodeT> &node_data): n(node_data.size()) {
-        init();
+        vector<nodeT> node_data(n+1);
         build(node_data);
     }
 
     explicit LazySegmentTree(const vector<valueT> &node_value): n(node_value.size()) {
         init();
         vector<nodeT> node_data;
-        node_data.reserve(n);
-        for(auto &v: node_value) node_data.push_back(nodeT(node_value));
-    }
-
-    explicit LazySegmentTree(valueT* begin, valueT* end): n(end-begin) {
-        init();
-        vector<nodeT> node_data;
-        node_data.reserve(n);
-        for_each(begin, end, [&node_data](const valueT& v){node_data.push_back(v);});
+        node_data.reserve(n+1);
+        node_data.pb(nodeT());
+        for(auto &v: node_value) node_data.push_back(nodeT(v));
+        build(node_data);
     }
 
     ~LazySegmentTree() = default;
-
 
     void build(const vector<nodeT> &node_data) {
         treeBuild(1,1,n,node_data);
     }
 
     nodeT& accessNode(int i) {
-        ++i;
         treeAccessNode(1,1,n,i);
         return tree[p2index[i]];
     }
     void updateRange(int x, int y, nodeT tagNode) {
-        ++x; ++y;
-        if(x==y) return nodeT();
-        treeUpdateRange(1,1,n,x,y-1,tagNode);
+        treeUpdateRange(1,1,n,x,y,tagNode);
     }
     void updatePoint(int x, nodeT tagNode) {
-        ++x;
         treeUpdateRange(1,1,n,x,x,tagNode);
     }
     nodeT queryRange(int x,int y) {
-        ++x; ++y;
-        if(x==y) return nodeT();
-        return treeQueryRange(1,1,n,x,y-1);
+        return treeQueryRange(1,1,n,x,y);
     }
 
     //not tested
@@ -136,7 +225,7 @@ private:
     void treeBuild(int root, int l, int r, const vector<nodeT> &node_data) {
         if(l==r) {
             p2index[l]=root;
-            tree[root] = node_data[l-1];
+            tree[root] = node_data[l];
             return;
         }
         treeBuild(segtree_lson, l, segtree_mid, node_data);
