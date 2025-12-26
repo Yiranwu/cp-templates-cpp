@@ -34,10 +34,11 @@
 # Custom Files
 .idea/
 input.txt
-main.cpp
+
 sol_checker.cpp
 uptodate.cpp
 cmake-build-debug/
 
 .DS_Store
 cmake-build-cf-main/
+outputs/

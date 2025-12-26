@@ -5,6 +5,8 @@
 #ifndef CF_BASE_LONGLONGWITHMOD_H
 #define CF_BASE_LONGLONGWITHMOD_H
 
+#include "../template/cp_template.h"
+
 class llM {
 public:
     ll v;
@@ -16,9 +18,9 @@ public:
     inline llM& operator += (llM x) {v = (v+x.v)%M; return *this;}
     inline llM& operator -= (llM x) {v = (v-x.v+M)%M; return *this;}
     inline llM& operator *= (llM x) {v = (v * x.v) % M; return *this;}
-    inline llM& operator /= (llM x) {v = (v * QinvM(x.v)) % M; return *this;}
-    inline llM& Qpow(llM x, ll p) {return Qpow(x.v, p);}
-    inline llM& Qinv(llM x) {return Qinv(x.v);}
+    inline llM& operator /= (llM x) {v = (v * ::Qinv(x.v, M)) % M; return *this;}
+    inline llM Qpow(llM x, ll p) {return ::Qpow(x.v, p, M);}
+    inline llM Qinv(llM x) {return ::Qinv(x.v, M);}
 
     ll get() const {return v;}
 };
