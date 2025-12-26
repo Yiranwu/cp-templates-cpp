@@ -12,7 +12,7 @@ public:
     }
 
     void solve() {
-        cout << 1;
+        cout << 2;
     }
 };
 
@@ -21,9 +21,9 @@ int main()
 {
     ios::sync_with_stdio(false); cin.tie(nullptr);
 #ifdef LOCAL
-    freopen("/Users/yiranwu1997/CLionProjects/cp-templates-cpp/input.txt", "r", stdin);
+    freopen("/Users/yiranwu1997/CLionProjects/cp-templates-cpp/outputs/input.txt", "r", stdin);
 #endif
-    //freopen("/Users/yiranwu1997/CLionProjects/cp-templates-cpp/output.txt", "w", stdout);
+    //freopen("/Users/yiranwu1997/CLionProjects/cp-templates-cpp/outputs/output.txt", "w", stdout);
 
     auto mysolver = solver();
     mysolver.solve();

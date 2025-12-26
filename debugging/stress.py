@@ -50,7 +50,14 @@ def main():
     gt_exec = "./gt.exe"
     
     # Input/Output files
-    files = ["input.txt", "my_out.txt", "gt_out.txt"]
+    OUTPUT_DIR = "outputs"
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+
+    input_path = os.path.join(OUTPUT_DIR, "input.txt")
+    my_out_path = os.path.join(OUTPUT_DIR, "my_out.txt")
+    gt_out_path = os.path.join(OUTPUT_DIR, "gt_out.txt")
+    wa_input_path = os.path.join(OUTPUT_DIR, "wa_input.txt")
     
     # Compilation Command Construction
     # default fallback
@@ -186,38 +193,38 @@ def main():
             # We pass iteration number as seed to generator if it accepts args, 
             # but simplest is generator handles randomness itself.
             # Capturing stdout of generator to write to input.txt
-            with open("input.txt", "w") as fgen:
+            with open(input_path, "w") as fgen:
                 subprocess.run([gen_exec, str(i)], stdout=fgen, check=True)
             
             # Run My Solution
-            if not run_solution(sol_exec, "input.txt", "my_out.txt"):
+            if not run_solution(sol_exec, input_path, my_out_path):
                  print(f"\n{RED}My Solution failed at iteration {i}{RESET}")
                  print(f"\n{BOLD}Input:{RESET}")
-                 with open("input.txt", "r") as f: print(f.read())
+                 with open(input_path, "r") as f: print(f.read())
                  break
 
             # Run Ground Truth
-            if not run_solution(gt_exec, "input.txt", "gt_out.txt"):
+            if not run_solution(gt_exec, input_path, gt_out_path):
                  print(f"\n{RED}Ground Truth failed at iteration {i}{RESET}")
                  print(f"\n{BOLD}Input:{RESET}")
-                 with open("input.txt", "r") as f: print(f.read())
+                 with open(input_path, "r") as f: print(f.read())
                  break
 
             # Compare
-            diff = subprocess.run(["diff", "-w", "-B", "my_out.txt", "gt_out.txt"], capture_output=True, text=True)
+            diff = subprocess.run(["diff", "-w", "-B", my_out_path, gt_out_path], capture_output=True, text=True)
             
             if diff.returncode != 0:
                 print(f"\n{RED}Mismatch found at iteration {i}!{RESET}")
                 
                 print(f"\n{BOLD}Input:{RESET}")
-                with open("input.txt", "r") as f: print(f.read())
+                with open(input_path, "r") as f: print(f.read())
                 
                 print(f"\n{BOLD}Diff (My Output vs Ground Truth):{RESET}")
                 print(diff.stdout)
                 
                 # Save the failing case
-                subprocess.run(["cp", "input.txt", "wa_input.txt"])
-                print(f"{BOLD}Failing input saved to 'wa_input.txt'{RESET}")
+                subprocess.run(["cp", input_path, wa_input_path])
+                print(f"{BOLD}Failing input saved to '{wa_input_path}'{RESET}")
                 break
         else:
             print(f"\n\n{GREEN}Passed all {args.iter} iterations!{RESET}")
