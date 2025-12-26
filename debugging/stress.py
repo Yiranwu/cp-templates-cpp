@@ -7,6 +7,7 @@ import time
 # ANSI color codes
 GREEN = '\033[92m'
 RED = '\033[91m'
+YELLOW = '\033[93m'
 RESET = '\033[0m'
 BOLD = '\033[1m'
 
@@ -53,7 +54,7 @@ def main():
     
     # Compilation Command Construction
     # default fallback
-    default_cmd = ["g++", "-O2", "-std=c++17", "{src}", "-o", "{exe}", "-DLOCAL"]
+    default_cmd = ["g++", "-O2", "-std=c++20", "{src}", "-o", "{exe}", "-DLOCAL"]
     
     # Try to find compile_commands.json
     compile_db_paths = [
@@ -126,25 +127,55 @@ def main():
         print(f"{YELLOW}Using default compilation command: {' '.join(default_cmd)}{RESET}")
 
 
-    try:
-        # Compile
-        def run_compile(src, exe):
-            # Substitute {src} and {exe}
-            # Note: compile_template is a list if defaults, or from JSON split
-            # If we want to support string replacements easily:
-            cmd_list = [arg.replace("{src}", src).replace("{exe}", exe) for arg in compile_template]
-            
-            print(f"Compiling {src}...")
-            res = subprocess.run(cmd_list, capture_output=True, text=True)
-            if res.returncode != 0:
-                 print(f"{RED}Compilation failed for {src}:{RESET}")
-                 print(res.stderr)
-                 sys.exit(1)
-            print(f"{GREEN}Compiled {src} successfully.{RESET}")
+    import shutil
 
-        run_compile(gen_src, gen_exec)
-        run_compile(sol_src, sol_exec)
-        run_compile(gt_src, gt_exec)
+    try:
+        # Helper to compile a specific file
+        # We might need to move the file to the same directory as the solution
+        # to ensure relative includes work as if it were the solution file.
+        def compile_target(src_path, output_exec, use_sol_dir=False):
+            target_src = src_path
+            temp_src = None
+            
+            # If we need to mimic being in the solution dir
+            if use_sol_dir:
+                sol_dir = os.path.dirname(os.path.abspath(args.sol))
+                src_dir = os.path.dirname(os.path.abspath(src_path))
+                
+                # If the file is not already in the solution dir, copy it there
+                if sol_dir != src_dir:
+                    basename = os.path.basename(src_path)
+                    # Add a prefix to avoid collision
+                    temp_src = os.path.join(sol_dir, f"_temp_stress_{basename}")
+                    print(f"{YELLOW}Copying {src_path} to {temp_src} for compilation context...{RESET}")
+                    shutil.copy(src_path, temp_src)
+                    target_src = temp_src
+
+            try:
+                # Substitute {src} and {exe}
+                # Note: compile_template is a list if defaults, or from JSON split
+                cmd_list = [arg.replace("{src}", target_src).replace("{exe}", output_exec) for arg in compile_template]
+                
+                print(f"Compiling {target_src}...")
+                res = subprocess.run(cmd_list, capture_output=True, text=True)
+                if res.returncode != 0:
+                     print(f"{RED}Compilation failed for {target_src}:{RESET}")
+                     print(res.stderr)
+                     sys.exit(1)
+                print(f"{GREEN}Compiled {target_src} successfully.{RESET}")
+            finally:
+                # Clean up temp file
+                if temp_src and os.path.exists(temp_src):
+                    os.remove(temp_src)
+
+        # Compile Generator (usually doesn't need strict context, but safe to use)
+        compile_target(gen_src, gen_exec, use_sol_dir=True)
+        
+        # Compile Solution (already in place)
+        compile_target(sol_src, sol_exec, use_sol_dir=False)
+        
+        # Compile Ground Truth (NEEDS to be in place)
+        compile_target(gt_src, gt_exec, use_sol_dir=True)
         
         print(f"\n{BOLD}Starting stress test for {args.iter} iterations...{RESET}\n")
 
@@ -194,11 +225,11 @@ def main():
     except KeyboardInterrupt:
         print(f"\n{BOLD}Stress test interrupted.{RESET}")
     finally:
-        # Cleanup can be optional, maybe user wants to inspect executables.
-        # Let's clean up temp output files but keep executables for repeated runs.
-        # for f in files:
-        #     if os.path.exists(f): os.remove(f)
-        pass
+        print(f"\n{YELLOW}Cleaning up executables...{RESET}")
+        for f in [gen_exec, sol_exec, gt_exec]:
+            if os.path.exists(f):
+                os.remove(f)
+        # We keep input.txt/my_out.txt/gt_out.txt as they might be useful for inspecting the last run
 
 if __name__ == "__main__":
     main()

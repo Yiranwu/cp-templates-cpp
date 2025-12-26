@@ -12,12 +12,7 @@ public:
     }
 
     void solve() {
-        vector<int> V;
-        V.push_back(1);
-        V.push_back(2);
-        map<int,int> M;
-        M[1]=2;
-        M[2]=4;
+        cout << 1;
     }
 };
 
