@@ -50,13 +50,6 @@ using namespace std;
 #define repin(i,l,r) for(int i=l;i<=r;++i)
 #define rrep(i,r,l) for(int i=r;i>l;--i)
 #define rrepin(i,r,l) for(int i=r;i>=l;--i)
-#define modM(a) (((a)%M+M)%M)
-#define addM(a,b) ((modM(a) + modM(b))%M)
-#define subM(a,b) (modM(modM(a) - modM(b)))
-#define multM(a,b) (modM(modM(a) * modM(b)))
-#define divM(a,b) (multM(a, Qinv(b,M)))
-#define QinvM(a) (Qinv(a,M))
-#define QpowM(a,b) (Qpow(a,b,M))
 #define all(data) (data).begin(), (data).end()
 #define println() printf("\n")
 #define endlCh '\n'
@@ -128,17 +121,8 @@ int popCount(T x) {std::make_unsigned_t<T> ux(x); return __builtin_popcount(ux);
 //math ops
 template <typename T> T sqr(T x) {return x*x;}
 inline ll Qpow(ll a,ll b){ll s=1;while(b){if(b&1){s=s*a;}a=a*a;b>>=1;}return s;}
-// M must be defined if using Qpow with mod. We will handle constants separately or expect them to be defined?
-// The problem is M is defined as const later in main.cpp.
-// For the shared library, we should probably declare M as extern or define it here if it's constant.
-// In main.cpp it was: const int H=23333; const ll M=998244353;
-// If we move it here, it works.
-// However, the original code had `Qpow(ll a,ll b,ll M)` which takes M as argument.
-// But macros like `modM(a)` use `M` as a global/captured identifier.
-// So `M` must be visible.
-
 inline ll Qpow(ll a,ll b,ll M){ll s=1;while(b){if(b&1){s=(s*a)%M;}a=a*a%M;b>>=1;}return s;}
-inline ll Qinv(ll a, ll M){return QpowM(a,M-2);}
+inline ll Qinv(ll a, ll M){return Qpow(a,M-2,M);}
 template <typename T> T _divceil_pos(T x, T y) {return x/y + (x%y>0);}
 template <typename T> T divceil(T x, T y) {return x>0?_divceil_pos(x,y):x/y;}
 template <typename T> T _divfloor_neg(T x, T y) {return x/y - (x%y<0);}
