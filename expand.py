@@ -13,6 +13,7 @@ class DependencyManager:
         self.cache_file = cache_file
         self.adj = {} # file -> list of included files (absolute paths)
         self.files = set()
+        self.timestamps = {} # filepath -> mtime
 
     def scan_directory(self, root_dir):
         """Scans a directory for .h and .cpp files and parses includes."""
@@ -28,12 +29,17 @@ class DependencyManager:
         filepath = os.path.abspath(filepath)
         self.files.add(filepath)
         
-        if filepath not in self.adj:
-            self.adj[filepath] = []
-            
         if not os.path.exists(filepath):
             return
 
+        try:
+            self.timestamps[filepath] = os.path.getmtime(filepath)
+        except OSError:
+            return
+
+        if filepath not in self.adj:
+            self.adj[filepath] = []
+            
         with open(filepath, 'r') as f:
             try:
                 content = f.read()
@@ -46,6 +52,9 @@ class DependencyManager:
         
         current_dir = os.path.dirname(filepath)
         
+        # Reset dependencies for this file as we are re-parsing
+        self.adj[filepath] = []
+
         for include_path in matches:
             # Resolve path
             # Strategy: 
@@ -66,15 +75,20 @@ class DependencyManager:
             
             if resolved:
                 # Add edge: filepath depends on resolved
-                # Note: dependency direction. If A includes B, A depends on B.
-                # So to use B, we need B first.
-                # Edge: A -> B
                 if resolved not in self.adj[filepath]:
                     self.adj[filepath].append(resolved)
 
     def save_cache(self):
+        # Create output dir if needed
+        cache_dir = os.path.dirname(self.cache_file)
+        if cache_dir and not os.path.exists(cache_dir):
+            os.makedirs(cache_dir, exist_ok=True)
+            
         with open(self.cache_file, 'w') as f:
-            json.dump({'adj': self.adj}, f, indent=2)
+            json.dump({
+                'adj': self.adj,
+                'timestamps': self.timestamps
+            }, f, indent=2)
         print(f"Dependencies saved to {self.cache_file}")
 
     def load_cache(self):
@@ -84,8 +98,28 @@ class DependencyManager:
             with open(self.cache_file, 'r') as f:
                 data = json.load(f)
                 self.adj = data.get('adj', {})
+                self.timestamps = data.get('timestamps', {})
+            
+            # Check for staleness
+            # We iterate over a copy of keys because we might modify graph
+            for filepath in list(self.adj.keys()):
+                if not os.path.exists(filepath):
+                    # File deleted, remove from graph logic could be complex, 
+                    # but for now we just verify existence.
+                    continue
+                
+                try:
+                    current_mtime = os.path.getmtime(filepath)
+                    cached_mtime = self.timestamps.get(filepath, 0)
+                    if current_mtime != cached_mtime:
+                        print(f"File changed, re-scanning: {filepath}")
+                        self.parse_file(filepath)
+                except OSError:
+                    pass
+                    
             return True
-        except:
+        except Exception as e:
+            print(f"Failed to load cache: {e}")
             return False
 
     def get_dependencies(self, root_files):
@@ -108,10 +142,12 @@ class DependencyManager:
                 for child in self.adj[node]:
                     queue.append(child)
             else:
-                # If parsed file (like main.cpp) not yet in graph, parse it on the fly?
-                # Or relying on previous scan?
-                # For main.cpp, we usually parse it ad-hoc.
-                pass
+                # Lazy parse if encountered but not in graph
+                if os.path.exists(node):
+                    self.parse_file(node)
+                    if node in self.adj:
+                         for child in self.adj[node]:
+                            queue.append(child)
 
         # Topological Sort on subgraph
         # Graph: A includes B => A->B
