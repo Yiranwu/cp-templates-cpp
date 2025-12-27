@@ -12,7 +12,7 @@ public:
     }
 
     void solve() {
-        cout << 2;
+        cout << 34;
     }
 };
 

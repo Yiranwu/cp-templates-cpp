@@ -36,8 +36,17 @@ else()
     endif()
 endif()
 
-add_executable(cf_main main.cpp)
-set_target_properties(cf_main PROPERTIES LINK_FLAGS -Wl,-stack_size,10240000)
+add_executable(bundle main.cpp)
+set_target_properties(bundle PROPERTIES 
+    LINK_FLAGS -Wl,-stack_size,10240000
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/bundle"
+)
+
+add_custom_command(TARGET bundle POST_BUILD
+    COMMAND python3 expand.py
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Bundling submission..."
+)
 #add_executable(cf_checker sol_checker.cpp cf-lib/SegmentTree.h cf-lib/BlockedList.h)
 
 #add_executable(cf_datagen generate_test_case.cpp)
@@ -54,11 +63,3 @@ if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
-
-# Custom target to bundle the submission
-add_custom_target(bundle
-    COMMAND python3 expand.py
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    COMMENT "Bundling submission..."
-)
-add_dependencies(bundle cf_main)
