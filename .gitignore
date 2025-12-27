@@ -36,6 +36,7 @@
 
 
 .DS_Store
+.cache
 cmake-build-cf-main/
 cmake-build-debug/
 outputs/

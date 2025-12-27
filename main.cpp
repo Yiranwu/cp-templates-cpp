@@ -12,6 +12,11 @@ public:
     }
 
     void solve() {
+        cin >> t;
+        while(t--) {
+            cin >> n;
+            read_range(a+1,a+n+1);
+        }
     }
 };
 
