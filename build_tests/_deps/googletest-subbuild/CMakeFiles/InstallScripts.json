@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/yiranwu1997/CLionProjects/cp-templates-cpp/build_tests/_deps/googletest-subbuild/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

@@ -1,1 +1,0 @@
-/usr/local/opt/llvm/bin/clang++ -Wall -DLOCAL -fsanitize=address -fexperimental-library -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/test_BIT.dir/ds/test_BIT.cpp.o CMakeFiles/test_BIT.dir/polyfill.cpp.o -o test_BIT  ../lib/libgtest_main.a ../lib/libgtest.a -lpthread

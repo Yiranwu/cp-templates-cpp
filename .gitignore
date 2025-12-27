@@ -40,3 +40,4 @@ cmake-build-cf-main/
 cmake-build-debug/
 outputs/
 debugging/gt_sol.cpp
+build_tests/

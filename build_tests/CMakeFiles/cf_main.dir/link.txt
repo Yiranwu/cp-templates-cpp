@@ -1,1 +1,0 @@
-/usr/local/opt/llvm/bin/clang++ -Wall -DLOCAL -fsanitize=address -fexperimental-library -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names -Wl,-stack_size,10240000 CMakeFiles/cf_main.dir/main.cpp.o -o cf_main
