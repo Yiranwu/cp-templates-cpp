@@ -41,6 +41,8 @@ set_target_properties(bundle PROPERTIES
     LINK_FLAGS -Wl,-stack_size,10240000
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/build/bundle"
 )
+target_precompile_headers(bundle PRIVATE template/cp_template.h)
+
 
 add_custom_command(TARGET bundle POST_BUILD
     COMMAND python3 expand.py
