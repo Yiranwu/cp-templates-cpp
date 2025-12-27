@@ -22,7 +22,7 @@ Contains the foundational code used in almost every CP submission.
 
 ### 🧪 `/tests` (Unit Testing)
 Infrastructure to ensure the correctness of the library code.
-- Uses **Google Test** to run unit tests on data structures and algorithms in `/cf-lib`.
+- **`Google Test`** is used to run unit tests on data structures and algorithms in `/cf-lib`.
 - Helps in maintaining reliability when modifying or optimizing library code.
 
 ### 📂 `/outputs` (Artifacts)
@@ -37,3 +37,20 @@ Personal notes, observations, and reminders related to competitive programming a
 
 - **`main.cpp`**: The primary workspace for writing solutions. This is the file you edit during a contest.
 - **`expand.py`**: A dependency bundler script. It resolves `#include` directives from `/cf-lib` and `/template`, combining them with your `main.cpp` solution into a single, standalone source file ready for submission to online judges.
+
+## Build and Submit "One-Click"
+
+To compile your solution and bundle it into a single file for submission, use the custom `bundle` target. We recommend using an out-of-source build directory (e.g., `build/bundle`) to keep the root directory clean.
+
+```bash
+# Configure (one time)
+cmake -S . -B build/bundle
+
+# Build and Bundle
+cmake --build build/bundle --target bundle
+```
+
+This will:
+1. Compile `main.cpp` to ensure correctness.
+2. Run `expand.py` to bundle dependencies.
+3. Generate the submission-ready code at `outputs/output.cpp`.

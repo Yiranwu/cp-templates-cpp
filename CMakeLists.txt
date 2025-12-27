@@ -54,3 +54,11 @@ if(BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+# Custom target to bundle the submission
+add_custom_target(bundle
+    COMMAND python3 expand.py
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Bundling submission..."
+)
+add_dependencies(bundle cf_main)
