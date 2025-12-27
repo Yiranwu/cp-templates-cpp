@@ -1,6 +1,4 @@
 cmake_minimum_required(VERSION 3.15)
-project(cf_base)
-
 set(CMAKE_CXX_STANDARD 23)
 set(use_gcc_flag OFF)
 if(use_gcc_flag)
@@ -12,6 +10,8 @@ else()
     set(CMAKE_C_COMPILER "/usr/local/opt/llvm/bin/clang")
     set(CMAKE_CXX_COMPILER "/usr/local/opt/llvm/bin/clang++")
 endif()
+
+project(cf_base)
 
 # If debugging, may need to skip some flags.
 # Had experience of watches not working before turning flags off.
@@ -41,9 +41,16 @@ set_target_properties(cf_main PROPERTIES LINK_FLAGS -Wl,-stack_size,10240000)
 #add_executable(cf_checker sol_checker.cpp cf-lib/SegmentTree.h cf-lib/BlockedList.h)
 
 #add_executable(cf_datagen generate_test_case.cpp)
+#add_executable(repro repro_hash.cpp tests/polyfill.cpp)
 #add_executable(cf_datagen_t generate_test_case_t.cpp)
 
 #add_executable(perf_test uptodate.cpp)
 #set_target_properties(perf_test PROPERTIES LINK_FLAGS -Wl,-stack_size,102400000)
 
 #add_executable(gt gt_sol.cpp)
+
+option(BUILD_TESTS "Build tests" OFF)
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

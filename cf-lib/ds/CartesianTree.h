@@ -61,41 +61,6 @@ public:
         subtree_ans[node] = subtree_ans[lson] + subtree_ans[rson];
         subtree_ans[node] += ll(src[node]) * (lsize+1) * (rsize+1);
     }
-
-    void get_delete_x_ans(int x, ll delta) {
-        int lson = l[x], rson = r[x];
-        ll LTsize = subtree_size[lson], RTsize = subtree_size[rson];
-        if(lson)
-            get_delete_x_ans(lson, delta + ll(src[x]) * (1 + RTsize));
-        if(rson)
-            get_delete_x_ans(rson, delta + ll(src[x]) * (1 + LTsize));
-        queue<int> Lchain, Rchain;
-        while(lson) Lchain.push(lson), lson=r[lson];
-        while(rson) Rchain.push(rson), rson=l[rson];
-
-        ll cur_ans = subtree_ans[root] - subtree_ans[x] - delta;
-
-        while(!Lchain.empty() || !Rchain.empty()) {
-            bool Lflag = Rchain.empty() || !Lchain.empty() && src[Lchain.front()] < src[Rchain.front()];
-            if(Lflag) {
-                int cur_root = Lchain.front();
-                LTsize -= subtree_size[l[cur_root]] + 1;
-                Lchain.pop();
-                ll lsize = subtree_size[l[cur_root]];
-                ll rsize = subtree_size[r[cur_root]] + RTsize;
-                cur_ans += ll(src[cur_root]) * (lsize+1) * (rsize+1) + subtree_ans[l[cur_root]];
-            }
-            else {
-                int cur_root = Rchain.front();
-                RTsize -= subtree_size[r[cur_root]] + 1;
-                Rchain.pop();
-                ll lsize = subtree_size[l[cur_root]] + LTsize;
-                ll rsize = subtree_size[r[cur_root]];
-                cur_ans += ll(src[cur_root]) * (lsize+1) * (rsize+1) + subtree_ans[r[cur_root]];
-            }
-        }
-        ans[x] = cur_ans;
-    }
 };
 
 

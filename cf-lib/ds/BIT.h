@@ -8,12 +8,16 @@
 #include "../../template/cp_template.h"
 
 // FenwickTree(int n)
-// Construct bit on index 0..n
+// Construct BIT on index 0..n
 // Point modification, range query
 
+// prefixSum(i): get sum of range [0, i]
 // rangeSum(lb,ub): get sum of range [lb, ub)
 // add(pos, delta): add delta to position pos
 // set(pos, x): set position pos to x
+// operator[pos]: get value at position pos
+// upper_bound(v): like std::upper_bound, only works if all elements are nonnegative
+
 template <typename T>
 class FenwickTree {
 public:
@@ -33,13 +37,13 @@ public:
     }
     T rangeSum(int lb, int ub) {
         if(ub<=lb) return T();
-        return prefixSum(min(ub,n+1)-1) - prefixSum(max(lb,0)-1);
+        return prefixSum(ub-1) - prefixSum(lb-1);
     }
     // Only makes sense when elements are nonnegative
     // Assumes 0 is soldier position, A[0]=0
     // Returns 0 if v is negative
     // Returns n+1 if v cannot be achieved by any prefix
-    T prefix_lb(int v) {
+    T upper_bound(int v) {
         if(v<0) return 0;
 
         T total = prefixSum(n);

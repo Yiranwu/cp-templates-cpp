@@ -1,0 +1,5 @@
+if(EXISTS "/Users/yiranwu1997/CLionProjects/cp-templates-cpp/build_tests/tests/test_BIT[1]_tests.cmake")
+  include("/Users/yiranwu1997/CLionProjects/cp-templates-cpp/build_tests/tests/test_BIT[1]_tests.cmake")
+else()
+  add_test(test_BIT_NOT_BUILT test_BIT_NOT_BUILT)
+endif()
