@@ -57,8 +57,8 @@ template <typename T, typename... Ts> void print_all(T &x, Ts&... xs) {cout << x
 template <typename T> void print_range(T pbegin, T pend)  {for(auto p=pbegin;p!=pend;++p) cout<<*p<<' '; cout<<'\n';}
 
 // Shortcuts or named popular ops
-template <typename T> void chkmax(T &x,T y){x<y?x=y:T();}
-template <typename T> void chkmin(T &x,T y){y<x?x=y:T();}
+template <typename T> inline void chkmax(T &x,T y){x<y?x=y:T();}
+template <typename T> inline void chkmin(T &x,T y){y<x?x=y:T();}
 template <typename T> bool inRange(T x, pair<T,T> range) {return range.x<=x && x<=range.y;}
 template <typename T> T parity(T x) {return x&1LL;}
 template <typename T> bool is_odd(T x) {return parity(x)==1;}
@@ -66,19 +66,19 @@ template <typename T> bool is_even(T x) {return parity(x)==0;}
 template <typename T> auto arrayToVector(T* pbegin, T* pend) {return vector<T>(pbegin, pend);}
 
 // Bit ops
-template<typename T> int log2i(T x) {return x;}//{return std::bit_width(x) - 1;}
-ll pow2(ll x){return 1LL<<x;}
-ll digitAt(ll x, int pow) {return x&pow2(pow);}
-bool digitIsOn(ll x, int pow) {return (x&pow2(pow))>0;}
-ll fullBitmask(ll n) {return pow2(n)-1;}
-ll rangeBitmask(ll pow_lb, ll pow_ub) {return fullBitmask(pow_ub) - fullBitmask(pow_lb);}
-ll extractBitRange(ll x, ll pow_lb, ll pow_ub) {return x & rangeBitmask(pow_lb, pow_ub);}
-ll lowbit(ll i) {return i & -i;}
-ll highbit(ll x) {while(x!=lowbit(x)) {x-=lowbit(x);} return x;}
-ll lowpow(ll x) {return log2i(lowbit(x));}
-ll highpow(ll x) {return log2i(highbit(x));}
+template<typename T> inline int log2i(T x) {return x;}//{return std::bit_width(x) - 1;}
+inline ll pow2(ll x){return 1LL<<x;}
+inline ll digitAt(ll x, int pow) {return x&pow2(pow);}
+inline bool digitIsOn(ll x, int pow) {return (x&pow2(pow))>0;}
+inline ll fullBitmask(ll n) {return pow2(n)-1;}
+inline ll rangeBitmask(ll pow_lb, ll pow_ub) {return fullBitmask(pow_ub) - fullBitmask(pow_lb);}
+inline ll extractBitRange(ll x, ll pow_lb, ll pow_ub) {return x & rangeBitmask(pow_lb, pow_ub);}
+inline ll lowbit(ll i) {return i & -i;}
+inline ll highbit(ll x) {while(x!=lowbit(x)) {x-=lowbit(x);} return x;}
+inline ll lowpow(ll x) {return log2i(lowbit(x));}
+inline ll highpow(ll x) {return log2i(highbit(x));}
 template <typename T>
-int popCount(T x) {std::make_unsigned_t<T> ux(x); return __builtin_popcount(ux);}
+inline int popCount(T x) {std::make_unsigned_t<T> ux(x); return __builtin_popcount(ux);}
 
 //math ops
 template <typename T> T sqr(T x) {return x*x;}

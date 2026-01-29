@@ -43,14 +43,39 @@ Personal notes, observations, and reminders related to competitive programming a
 To compile your solution and bundle it into a single file for submission, use the custom `bundle` target. We recommend using an out-of-source build directory (e.g., `build/bundle`) to keep the root directory clean.
 
 ```bash
+# Define path to CMake
+CMAKE="/Volumes/Airpi - Kioxia SE10 2T/ExternalApps/CLion.app/Contents/bin/cmake/mac/aarch64/bin/cmake"
+
 # Configure (one time)
-cmake -S . -B build/bundle
+"$CMAKE" -S . -B build/bundle
 
 # Build and Bundle
-cmake --build build/bundle --target bundle
+"$CMAKE" --build build/bundle --target bundle
 ```
 
 This will:
 1. Compile `main.cpp` to ensure correctness.
 2. Run `expand.py` to bundle dependencies.
 3. Generate the submission-ready code at `outputs/output.cpp`.
+
+## Running Tests
+Tests are disabled by default to speed up daily builds. To run tests:
+
+```bash
+# Configure with tests enabled
+"$CMAKE" -S . -B build/tests -DBUILD_TESTS=ON
+
+# Build All Tests
+"$CMAKE" --build build/tests --target test_runner
+
+# Run All Tests
+cd build/tests && ctest --output-on-failure
+```
+
+## Troubleshooting
+
+### CMake Cache Issues
+If your system environment changes (e.g., macOS update, SDK update), you may encounter build errors due to stale cache entries. To resolve this:
+1. Delete the default CLion build directory (usually `cmake-build-cf-main`) or your custom build directory.
+2. Reload the CMake project (in CLion: **File** > **Reload CMake Project**).
+3. Re-run the build command.
